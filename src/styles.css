@@ -2,4 +2,66 @@
 
 /* Tailwind */
 
+@theme {
+    /* Colors */
+    --color-dark-purple: #635FC7;
+    --color-light-purple: #A8A4FF;
+    --color-dark-red: #EA5555;
+    --color-light-red: #FF9898;
+    
+    --color-black: #000112;
+
+    --color-very-dark-grey: #20212C;
+    --color-dark-grey: #2B2C37;
+    --color-medium-gray: #828FA3;
+    --color-light-grey: #F4F7FD;
+
+    --color-lines-dark: #3E3F4E;
+    --color-lines-light: #E4EBFA;
+
+    /* Typography */
+    --font-jakarta: "Plus Jakarta Sans", sans-serif;
+
+    --text-heading-xl: 1.5rem;
+    --text-heading-xl--font-weight: bold;
+    --text-heading-xl--line-height: 1.875rem;
+
+    --text-heading-l: 1.125rem;
+    --text-heading-l--font-weight: bold;
+    --text-heading-l--line-height: 1.4375rem;
+
+    --text-heading-m: 0.9375rem;
+    --text-heading-m--font-weight: bold;
+    --text-heading-m--line-height: 1.1875rem;
+
+    --text-heading-s: 0.75rem;
+    --text-heading-s--font-weight: bold;
+    --text-heading-s--line-height: 0.9375rem; 
+    --text-heading-s--letter-spacing: 0.15rem;
+
+    --text-body-l: 0.8125rem;
+    --text-body-l--font-weight: medium;
+    --text-body-l--line-height: 1.4375rem;
+
+    --text-body-s: 0.75rem;
+    --text-body-s--font-weight: bold;
+    --text-body-s--line-height: 0.9375rem;
+
+    /* Desktop breakpoint */
+    --breakpoint-2xl: 90rem;
+}
+
+@layer base {
+    html {
+        @apply font-jakarta;
+    }
+    
+    * {
+        box-sizing: border-box;
+    }
+}
+
+/* Applies dark: classes when .dark is applied to the html */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* CSS */
