@@ -1,6 +1,6 @@
 import {BrowserRouter, Routes, Route} from "react-router-dom"
+// Components
 import Layout from "./components/Layout"
-// import Sidebar from "./components/Sidebar"
 import Board from "./components/Board"
 
 export default function App() {

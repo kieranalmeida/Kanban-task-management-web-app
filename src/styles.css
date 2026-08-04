@@ -48,7 +48,7 @@
     --text-body-s--line-height: 0.9375rem;
 
     /* Desktop breakpoint */
-    --breakpoint-2xl: 90rem;
+    --breakpoint-2xl: 90rem; /* 1440px */
 }
 
 @layer base {
@@ -61,7 +61,5 @@
     }
 }
 
-/* Applies dark: classes when .dark is applied to the html */
-@custom-variant dark (&:where(.dark, .dark *));
-
-/* CSS */
+/* Applies dark: classes on any elements where the .dark class is applied to the parent  */
+@custom-variant dark (&:where(.dark, .dark *))

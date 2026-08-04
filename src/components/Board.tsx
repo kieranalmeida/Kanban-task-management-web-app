@@ -1,7 +1,7 @@
 export default function Board() {
     return (
-        <>
-            <h1 className="">Board</h1>
-        </>
+        <main className="w-full h-screen p-6 bg-light-grey dark:bg-very-dark-grey">
+            <h1 className="text-black dark:text-white">Board</h1>
+        </main>
     )
 }
