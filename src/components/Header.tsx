@@ -1,6 +1,13 @@
+import { useState, useRef, useEffect } from "react"
 import { Link } from "react-router-dom"
+// Components
+import ThemeSwitch from "./ThemeSwitch"
+// Context
 import { useTheme } from "./ThemeContext"
 import { useSidebar } from "./SidebarContext"
+import { useBoard } from "./BoardContext"
+// Data
+import data from "../data/data.json"
 // Images
 import logoMobile from "../images/logo-mobile.svg"
 import logoLight from "../images/logo-light.svg"
@@ -8,14 +15,75 @@ import logoDark from "../images/logo-dark.svg"
 import chevronDown from "../images/icon-chevron-down.svg"
 import addTaskMobile from "../images/icon-add-task-mobile.svg"
 import verticalEllipsis from "../images/icon-vertical-ellipsis.svg"
+import BoardIcon from "../images/icon-board.svg?react"
+import lightThemeIcon from "../images/icon-light-theme.svg"
+import darkThemeIcon from "../images/icon-dark-theme.svg"
 
 export default function Header() {
-    const {darkMode} = useTheme()
-    // Controls whether or not the sidebar is open
-    const { sidebarOpen, setSidebarOpen } = useSidebar()
+    const { darkMode } = useTheme() // Controls website theme
+    const { sidebarOpen } = useSidebar() // Controls whether or not the sidebar is open
+    const { activeBoard, setActiveBoard } = useBoard() // Controls active board
+    const [menuOpen, setMenuOpen] = useState(false) // Controls header mobile menu
+    const menuRef = useRef<HTMLDivElement | null>(null) // Used to handle outside clicks for header mobile menu
+    const boardsNum = data.boards.length // Get amount of boards
+
+    // Handle outside clicks when menu is open
+    useEffect( () => {
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                menuRef.current 
+                && !menuRef.current.contains(event.target as Node)
+            ) {
+                setMenuOpen(false)
+            }
+        }
+        
+        if (menuOpen) {
+            document.addEventListener("mousedown", handleClickOutside)
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside)
+        }
+    }, [menuOpen])
+
+    // Close menu automatically (if open) when screen size increases
+    useEffect( () => {
+        const media = window.matchMedia("(min-width: 768px)")
+
+        const closeMenu = (e: MediaQueryListEvent) => {
+            if (menuOpen && e.matches) {
+                setMenuOpen(false)
+            }
+        }
+
+        media.addEventListener("change", closeMenu)
+
+        return () => {
+            media.removeEventListener("change", closeMenu)
+        }
+    }, [])
+    
+    // Board button normal + active styling
+    const boardButtonClass = (name: string) => `
+        flex items-center gap-x-3 w-full text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer 
+        ${activeBoard === name ? "text-white bg-dark-purple" : "text-medium-gray hover:text-dark-purple hover:bg-dark-purple/10 dark:hover:bg-white"}  
+    `
+
+    // Creates a button for each board
+    const boardButtons = data.boards.map( (board) => {
+        return (
+            <li className="flex items-center w-full rounded-r-full" key={board.name}>
+                <button onClick={ () => setActiveBoard(board.name) } className={boardButtonClass(board.name)}>
+                    <BoardIcon/>
+                    {board.name}
+                </button>
+            </li>
+        )
+    }) 
     
     return (
-        <header className="flex items-center gap-x-4 md:gap-x-0 h-16 md:h-20 2xl:h-24 px-4 md:px-0 dark:bg-dark-grey">
+        <header className="relative flex items-center justify-center gap-x-4 md:gap-x-0 h-16 md:h-20 2xl:h-24 px-4 md:px-0 dark:bg-dark-grey">
             {/* Logo */}
             <div className={`h-full ${sidebarOpen ? "" : "md:border-b"} border-lines-light dark:border-lines-dark`}>
                 {/* Mobile logo */}
@@ -39,10 +107,10 @@ export default function Header() {
                 </div>
             </div>
 
-            {/* Second half */}
+            {/* Main header */}
             <div className="flex items-center justify-between gap-x-18 w-full h-full md:pl-6 md:pr-3 2xl:pr-4 md:border-b border-lines-light dark:border-lines-dark">
                 <div>
-                    <button className="flex items-center gap-x-2 cursor-pointer md:hidden">
+                    <button onClick={ () => setMenuOpen(!menuOpen) } className="flex items-center gap-x-2 cursor-pointer md:hidden">
                         <span className="text-black text-heading-l dark:text-white">Platform Launch</span>
                         <img className="mt-1" src={chevronDown} alt=""/>
                     </button>
@@ -66,6 +134,40 @@ export default function Header() {
                     </button>
                 </div>
             </div>
+
+            {/* Mobile version of sidebar menu */}
+            {menuOpen &&
+                <div ref={menuRef} className="absolute z-10 top-20 flex flex-col gap-y-4 w-66 py-4 bg-white border-r border-lines-light rounded-lg shadow-xl dark:bg-dark-grey dark:border-lines-dark">
+                    <div className="flex flex-col gap-y-4.75">
+                        {/* Heading */}
+                        <h2 className="pl-6 text-[0.75rem] text-medium-gray font-bold tracking-[0.15rem] uppercase">All boards ({boardsNum})</h2>
+        
+                        {/* Board buttons */}
+                        <ul className="flex flex-col items-start w-60">
+                            {boardButtons}
+        
+                            <li className="flex items-center w-full rounded-r-full">
+                                <button className="flex items-center gap-x-3 w-full text-dark-purple text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer">
+                                    <BoardIcon/>
+                                    + Create New Board
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+        
+                    {/* Theme control */}
+                    <div className="flex justify-center items-center gap-x-5.5 w-58.75 mx-auto py-3.5 bg-light-grey rounded-lg dark:bg-very-dark-grey">
+                        <img src={lightThemeIcon}/>
+                        <ThemeSwitch/>
+                        <img src={darkThemeIcon}/>
+                    </div>
+                </div>
+            }
+            
+            {/* Darkened screen effect when mobile menu is open */}
+            {menuOpen &&
+                <div className="fixed z-5 inset-0 bg-black/50"></div>
+            }
         </header>
     )
 }

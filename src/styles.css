@@ -61,5 +61,5 @@
     }
 }
 
-/* Applies dark: classes on any elements where the .dark class is applied to the parent  */
+/* Applies dark: classes on any elements where the .dark class is applied to the parent */
 @custom-variant dark (&:where(.dark, .dark *))

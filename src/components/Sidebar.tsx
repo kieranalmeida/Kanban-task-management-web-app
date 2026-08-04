@@ -2,6 +2,8 @@ import { useState, useEffect } from "react"
 import { useSidebar } from "./SidebarContext"
 // Components
 import ThemeSwitch from "./ThemeSwitch"
+// Context
+import { useBoard } from "./BoardContext"
 // Data
 import data from "../data/data.json"
 // Images
@@ -12,15 +14,29 @@ import HideSidebarIcon from "../images/icon-hide-sidebar.svg?react"
 import ShowSidebarIcon from "../images/icon-show-sidebar.svg?react"
 
 export default function Sidebar() {
-    // Is the screen at the tablet breakpoint or higher (true or false)
-    const [isTablet, setIsTablet] = useState(window.matchMedia("(min-width: 768px)").matches)
-    // Controls whether or not the sidebar is open
-    const { sidebarOpen, setSidebarOpen } = useSidebar()
-    // Controls the active board
-    const [activeBoard, setActiveBoard] = useState("Platform Launch")
-    // Get the amount of boards
-    const boardsNum = data.boards.length
+    const [isTablet, setIsTablet] = useState(window.matchMedia("(min-width: 768px)").matches) // Is the screen at the tablet breakpoint or higher (true or false)
+    const { sidebarOpen, setSidebarOpen } = useSidebar() // Controls whether or not the sidebar is open
+    const { activeBoard, setActiveBoard } = useBoard() // Controls active board
+    const boardsNum = data.boards.length // Get the amount of boards
     
+    // Board button normal + active styling
+    const boardButtonClass = (name: string) => `
+        flex items-center gap-x-3 w-full text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer 
+        ${activeBoard === name ? "text-white bg-dark-purple" : "text-medium-gray hover:text-dark-purple hover:bg-dark-purple/10 dark:hover:bg-white"}  
+    `
+
+    // Creates a button for each board
+    const boardButtons = data.boards.map( (board) => {
+        return (
+            <li className="flex items-center w-full rounded-r-full" key={board.name}>
+                <button onClick={ () => setActiveBoard(board.name) } className={boardButtonClass(board.name)}>
+                    <BoardIcon/>
+                    {board.name}
+                </button>
+            </li>
+        )
+    }) 
+
     // Checks if the screen size is above or below the tablet breakpoint and updates the isTablet state accordingly
     useEffect( () => {
         const media = window.matchMedia("(min-width: 768px)")
@@ -36,13 +52,6 @@ export default function Sidebar() {
         }
     }, [])
 
-    const boardButtonClass = (name: string) => `
-        flex items-center gap-x-3 w-full text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer 
-        ${activeBoard === name ? "text-white bg-dark-purple" : "text-medium-gray hover:text-dark-purple hover:bg-dark-purple/10 dark:hover:bg-white"}  
-    `
-
-    // Move board buttons here?
-
     return (
         <>
             {
@@ -56,18 +65,7 @@ export default function Sidebar() {
             
                             {/* Board buttons */}
                             <ul className="flex flex-col items-start w-60 2xl:w-69">
-                                {
-                                    data.boards.map( (board) => {
-                                        return (
-                                            <li className="flex items-center w-full rounded-r-full" key={board.name}>
-                                                <button onClick={ () => setActiveBoard(board.name) } className={boardButtonClass(board.name)}>
-                                                    <BoardIcon/>
-                                                    {board.name}
-                                                </button>
-                                            </li>
-                                        )
-                                    })    
-                                }
+                                {boardButtons}
             
                                 <li className="flex items-center w-full rounded-r-full">
                                     <button className="flex items-center gap-x-3 w-full text-dark-purple text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer">
@@ -102,10 +100,3 @@ export default function Sidebar() {
         </>
     )
 }
-
-// Screen is below tablet breakpoint? Show header menu version
-// Screen is above tablet breakpoint? Show normal header version
-// Header menu on mobile
-
-
-// Control active board with state

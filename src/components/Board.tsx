@@ -5,3 +5,6 @@ export default function Board() {
         </main>
     )
 }
+
+// Control active board with state
+// Create board button (create + add boards to array)
