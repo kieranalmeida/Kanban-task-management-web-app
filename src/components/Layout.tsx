@@ -32,10 +32,10 @@ export default function Layout() {
                 <BoardContext.Provider value={ {activeBoard, setActiveBoard} }>
 
                     {/* If darkMode is enabled, apply "dark" to this div, which wraps the entire website, activating the @custom-variant in the CSS */}
-                    <div className={darkMode ? "dark" : ""}>
+                    <div className={`${darkMode ? "dark" : ""} flex flex-col min-h-screen`}>
                         <Header/>
                         
-                        <div className="flex">
+                        <div className="flex min-h-screen">
                             <Sidebar/>
                             <Outlet />
                         </div>
