@@ -58,7 +58,7 @@ export default function Sidebar() {
                 !isTablet ? null
                 : 
                 isTablet && sidebarOpen ? (
-                    <div className="flex flex-col justify-between shrink-0 w-65.25 2xl:w-75 border-r border-lines-light dark:bg-dark-grey dark:border-lines-dark">
+                    <div className="flex flex-col justify-between shrink-0 w-65.25 2xl:w-75 border-r border-lines-light dark:bg-dark-grey dark:border-lines-dark ">
                         <div className="flex flex-col gap-y-4.75">
                             {/* Heading */}
                             <h2 className="mt-7.75 pl-6 text-[0.75rem] text-medium-gray font-bold tracking-[0.15rem] uppercase">All boards ({boardsNum})</h2>

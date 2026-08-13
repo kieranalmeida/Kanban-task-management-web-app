@@ -39,7 +39,7 @@ export default function Board() {
     })
     
     return (
-        <main className="flex w-full p-6 bg-light-grey overflow-x-auto dark:bg-very-dark-grey">
+        <main className="flex w-full h-full p-6 bg-light-grey overflow-auto dark:bg-very-dark-grey">
             {
                 targetBoard?.columns?.length === 0 ? (
                     // Active board has no columns
@@ -52,10 +52,10 @@ export default function Board() {
                 )
                 : (
                     // Active board has at least one column
-                    <div className="flex gap-x-6">
+                    <div className="flex gap-x-6 h-max">
                         {boardHtml}
 
-                        <div className="flex flex-col gap-y-6 shrink-0 w-70">
+                        <div className="flex flex-col gap-y-6 h-203.5 shrink-0 w-70">
                             {/* Empty div for spacing */}
                             <div className="w-full h-4 pointer-events-none"/>
 
@@ -87,5 +87,6 @@ export default function Board() {
 // Limit boards, columns and tasks
 // No boards message
 // Task placeholder for empty columns?
+// "Add new column" column: max-h-203.5 // h-203.5 // min-h-0
 
 // Create a component for everything
