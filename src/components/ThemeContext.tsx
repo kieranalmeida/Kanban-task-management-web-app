@@ -5,7 +5,7 @@ type ThemeContextType = {
     setDarkMode: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-// The context is initialized as null here, but is later given the darkMode state and setter function by the Provider
+// The context is initialized as null here, but is later given the state and setter function by the Provider
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
 // A custom hook handles context access because TypeScript will complain otherwise (context may be null)
@@ -16,6 +16,6 @@ export const useTheme = () => {
     // Returns an error if useTheme is used outside of ThemeContext.Provider (in other words, if you try to receive the context values where they aren't being provided)
     if (!context) throw new Error("useTheme must be used within ThemeProvider")
 
-    // Returns ThemeContext
+    // Returns context
     return context
 }

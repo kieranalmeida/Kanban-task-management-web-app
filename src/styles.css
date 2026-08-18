@@ -13,7 +13,7 @@
 
     --color-very-dark-grey: #20212C;
     --color-dark-grey: #2B2C37;
-    --color-medium-gray: #828FA3;
+    --color-medium-grey: #828FA3;
     --color-light-grey: #F4F7FD;
 
     --color-lines-dark: #3E3F4E;
@@ -43,11 +43,12 @@
     --text-body-l--font-weight: medium;
     --text-body-l--line-height: 1.4375rem;
 
-    --text-body-s: 0.75rem;
-    --text-body-s--font-weight: bold;
-    --text-body-s--line-height: 0.9375rem;
+    --text-body-m: 0.75rem;
+    --text-body-m--font-weight: bold;
+    --text-body-m--line-height: 0.9375rem;
 
-    /* Desktop breakpoint */
+    /* Breakpoints */
+    --breakpoint-sm: 23.5rem; /* 376px */
     --breakpoint-2xl: 90rem; /* 1440px */
 }
 
