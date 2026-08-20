@@ -13,10 +13,14 @@ import HideSidebarIcon from "../images/icon-hide-sidebar.svg?react"
 import ShowSidebarIcon from "../images/icon-show-sidebar.svg?react"
 
 export default function Sidebar() {
+    // State variables
     const [isTablet, setIsTablet] = useState(window.matchMedia("(min-width: 768px)").matches) // Is the screen at the tablet breakpoint or higher (true or false)
-    const { sidebarOpen, setSidebarOpen } = useSidebar() // Controls whether or not the sidebar is open
-    const { boards } = useBoards() // Controls boards
-    const { activeBoardId, setActiveBoardId } = useActiveBoardId() // Controls active board ID
+
+    // Context
+    const { sidebarOpen, setSidebarOpen } = useSidebar()
+    const { boards } = useBoards() //
+    const { activeBoardId, setActiveBoardId } = useActiveBoardId()
+
     // Derived values
     const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
     const boardsNum = boards.length // Get the amount of boards

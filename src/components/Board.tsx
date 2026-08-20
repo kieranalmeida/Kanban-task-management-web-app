@@ -6,10 +6,15 @@ import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
 
 export default function Board() {
-    const { boards } = useBoards() // Controls boards
-    const { activeBoardId } = useActiveBoardId() // Controls active board ID
-    const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
-    const [activeTaskId, setActiveTaskId] = useState<string | null>(null) // Control selected task
+    // State variables
+    const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
+
+    // Context
+    const { boards } = useBoards()
+    const { activeBoardId } = useActiveBoardId()
+
+    // Derived values
+    const activeBoard = boards.find( (board) => board.id === activeBoardId)
     
     const boardHtml = activeBoard?.columns?.map( (column, index) => {
         const colors = ["bg-sky-400", "bg-fuchsia-500", "bg-green-500", "bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-teal-400", "bg-cyan-400", "bg-blue-500", "bg-indigo-500", "bg-rose-500"]
@@ -43,7 +48,7 @@ export default function Board() {
             </section>
         )
     })
-    
+
     return (
         <main className="flex w-full h-full bg-light-grey overflow-auto dark:bg-very-dark-grey">
             {
@@ -52,7 +57,7 @@ export default function Board() {
                     <div className="flex justify-center items-center w-full p-6 md:p-16">
                         <div className="flex flex-col justify-center items-center gap-y-10 text-center">
                             <h2 className="text-medium-grey text-heading-l">This board is empty. Create a new column to get started.</h2>
-                            <button className="px-4.5 py-3.75 text-white bg-dark-purple rounded-2xl cursor-pointer hover:bg-dark-purple/60">+ Add New Column</button>
+                            <button className="px-4.5 py-3.75 text-white bg-dark-purple rounded-2xl cursor-pointer hover:bg-light-purple">+ Add New Column</button>
                         </div>
                     </div>
                 )

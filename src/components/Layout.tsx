@@ -18,6 +18,7 @@ export default function Layout() {
     const [darkMode, setDarkMode] = useState(
         localStorage.getItem("darkMode") === "true"
     )
+    
     // Controls the sidebar
     const [sidebarOpen, setSidebarOpen] = useState(true)
     

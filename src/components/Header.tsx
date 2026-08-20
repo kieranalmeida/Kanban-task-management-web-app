@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { Link } from "react-router-dom"
 // Components
 import ThemeSwitch from "./ThemeSwitch"
+import AddTask from "./AddTask"
 // Context
 import { useTheme } from "./ThemeContext"
 import { useSidebar } from "./SidebarContext"
@@ -19,14 +20,21 @@ import lightThemeIcon from "../images/icon-light-theme.svg"
 import darkThemeIcon from "../images/icon-dark-theme.svg"
 
 export default function Header() {
-    const { darkMode } = useTheme() // Controls website theme
-    const { sidebarOpen } = useSidebar() // Controls whether or not the sidebar is open
-    const { boards } = useBoards() // Controls boards
-    const { activeBoardId, setActiveBoardId } = useActiveBoardId() // Controls active board ID
-    const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
+    // State variables
     const [menuOpen, setMenuOpen] = useState(false) // Controls header mobile menu
+    const [addTaskOpen, setAddTaskOpen] = useState(false) // Controls add task menu
+
+    // Refs
     const menuRef = useRef<HTMLDivElement | null>(null) // Used to handle outside clicks for header mobile menu
+    
+    // Context
+    const { darkMode } = useTheme()
+    const { sidebarOpen } = useSidebar()
+    const { boards } = useBoards()
+    const { activeBoardId, setActiveBoardId } = useActiveBoardId() // Controls active board ID
+
     // Derived values
+    const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
     const boardsNum = boards.length // Get amount of boards
 
     // Handle outside clicks when menu is open
@@ -64,7 +72,7 @@ export default function Header() {
         return () => {
             media.removeEventListener("change", closeMenu)
         }
-    }, [])
+    }, [menuOpen])
     
     // Board button normal + active styling
     const boardButtonClass = (name: string) => `
@@ -75,7 +83,7 @@ export default function Header() {
     // Creates a button for each board
     const boardButtons = boards.map( (board) => {
         return (
-            <li className="flex items-center w-full rounded-r-full" key={board.name}>
+            <li onClick={ () => setMenuOpen(false) } className="flex items-center w-full rounded-r-full" key={board.name}>
                 <button onClick={ () => setActiveBoardId(board.id) } className={boardButtonClass(board.name)}>
                     <BoardIcon/>
                     {board.name}
@@ -85,7 +93,7 @@ export default function Header() {
     }) 
     
     return (
-        <header className="relative flex items-center justify-center gap-x-4 md:gap-x-0 h-16 md:h-20 2xl:h-24 px-4 md:px-0 dark:bg-dark-grey">
+        <header className="flex items-center justify-center gap-x-4 md:gap-x-0 h-16 md:h-20 2xl:h-24 px-4 md:px-0 dark:bg-dark-grey">
             {/* Logo */}
             <div className={`h-full ${sidebarOpen ? "" : "md:border-b"} border-lines-light dark:border-lines-dark`}>
                 {/* Mobile logo */}
@@ -122,12 +130,12 @@ export default function Header() {
 
                 <div className="flex items-center gap-x-3">
                     {/* Mobile add task button */}
-                    <button className="py-2.5 px-4.5 bg-dark-purple rounded-2xl cursor-pointer hover:opacity-60 md:hidden">
+                    <button onClick={ () => setAddTaskOpen(true) } className="py-2.5 px-4.5 bg-dark-purple rounded-2xl cursor-pointer hover:bg-light-purple md:hidden">
                         <img src={addTaskMobile} alt="Add new task"/>
                     </button>
 
                     {/* Tablet and Desktop add task button */}
-                    <button className="py-3.75 px-6 text-white text-heading-m bg-dark-purple rounded-3xl cursor-pointer hover:opacity-60 hidden md:block">
+                    <button onClick={ () => setAddTaskOpen(true) } className="py-3.75 px-6 text-white text-heading-m bg-dark-purple rounded-3xl cursor-pointer hover:bg-light-purple hidden md:block">
                         + Add New Task
                     </button>
 
@@ -139,35 +147,34 @@ export default function Header() {
 
             {/* Mobile version of sidebar menu */}
             {menuOpen &&
-                <div ref={menuRef} className="absolute z-10 top-20 flex flex-col gap-y-4 w-66 py-4 bg-white border-r border-lines-light rounded-lg shadow-xl dark:bg-dark-grey dark:border-lines-dark">
-                    <div className="flex flex-col">
-                        {/* Heading */}
-                        <h2 className="mb-4.75 pl-6 text-[0.75rem] text-medium-grey font-bold tracking-[0.15rem] uppercase">All boards ({boardsNum})</h2>
-        
-                        {/* Board buttons */}
-                        <ul className="flex flex-col items-start w-60">
-                            {boardButtons}
-                        </ul>
-                    
-                        <button className="flex items-center gap-x-3 w-full text-dark-purple text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer">
-                            <BoardIcon/>
-                            + Create New Board
-                        </button>
-                    </div>
-        
-                    {/* Theme control */}
-                    <div className="flex justify-center items-center gap-x-5.5 w-58.75 mx-auto py-3.5 bg-light-grey rounded-lg dark:bg-very-dark-grey">
-                        <img src={lightThemeIcon}/>
-                        <ThemeSwitch/>
-                        <img src={darkThemeIcon}/>
+                <div className="absolute inset-0 flex justify-center bg-black/50">
+                    <div ref={menuRef} className="absolute top-20 flex flex-col gap-y-4 w-66 py-4 bg-white border-r border-lines-light rounded-lg shadow-xl dark:bg-dark-grey dark:border-lines-dark">
+                        <div className="flex flex-col">
+                            {/* Heading */}
+                            <h2 className="mb-4.75 pl-6 text-[0.75rem] text-medium-grey font-bold tracking-[0.15rem] uppercase">All boards ({boardsNum})</h2>
+            
+                            {/* Board buttons */}
+                            <ul className="flex flex-col items-start w-60">
+                                {boardButtons}
+                            </ul>
+                        
+                            <button className="flex items-center gap-x-3 w-full text-dark-purple text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer">
+                                <BoardIcon/>
+                                + Create New Board
+                            </button>
+                        </div>
+            
+                        {/* Theme control */}
+                        <div className="flex justify-center items-center gap-x-5.5 w-58.75 mx-auto py-3.5 bg-light-grey rounded-lg dark:bg-very-dark-grey">
+                            <img src={lightThemeIcon}/>
+                            <ThemeSwitch/>
+                            <img src={darkThemeIcon}/>
+                        </div>
                     </div>
                 </div>
             }
-            
-            {/* Darkened screen effect when mobile menu is open */}
-            {menuOpen &&
-                <div className="fixed z-5 inset-0 bg-black/50"></div>
-            }
+
+            {addTaskOpen && <AddTask setAddTaskOpen={setAddTaskOpen}/>}
         </header>
     )
 }

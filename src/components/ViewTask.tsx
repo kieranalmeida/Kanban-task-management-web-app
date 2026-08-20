@@ -18,7 +18,7 @@ export default function ViewTask({activeTaskId, setActiveTaskId}: ViewTaskProps)
 
     // Refs
     const viewTaskRef = useRef<HTMLDivElement | null>(null)
-    const settingsRef = useRef<HTMLDivElement| null>(null)
+    const settingsRef = useRef<HTMLDivElement | null>(null)
     const selectBoxRef = useRef<HTMLDivElement | null>(null) 
 
     // Context
@@ -34,10 +34,10 @@ export default function ViewTask({activeTaskId, setActiveTaskId}: ViewTaskProps)
     if (!activeTask || !activeColumn) return
     const completedTasks = activeTask?.subtasks.filter( (subtask) => subtask.isCompleted === true) // Get the amount of completed subtasks for the current task
     
-    // Handles outside clicks
+    // Handle outside clicks
     useEffect( () => {
         function handleClickOutside(event: MouseEvent) {
-            // ViewTask
+            // ViewTask menu
             if (
                 viewTaskRef.current 
                 && !viewTaskRef.current.contains(event.target as Node)
@@ -74,48 +74,50 @@ export default function ViewTask({activeTaskId, setActiveTaskId}: ViewTaskProps)
         // Check if activeColumn and so TypeScript doesn't complain
         if (!activeColumn || !activeTask) return
 
+        // Iterate through prevBoards until targetSubtask is reached and then flip its isCompleted property. Return non-active boards, columns, tasks and subtasks untouched.
         setBoards( (prevBoards) =>
             prevBoards.map( (board) => {
-                // If the current board doesn't match the activeBoard (the one that is currently being updated) then just return the board as normal
-                if (board.id !== activeBoardId) return board
+                if (board.id !== activeBoardId) {
+                    return board
+                }
 
-                // Otherwise, if on the correct board, start iterating
                 return {
                     ...board,
                     columns: board.columns.map( (column) => {
-                        if (column.id === activeColumn.id) {
-                            return {
-                                ...column,
-                                tasks: column.tasks.map( (task) => {
-                                    if (task.id !== activeTask.id) {
-                                        return task
-                                    }
-                                    
-                                    return {
-                                        ...task,
-                                        subtasks: task.subtasks.map( (subtask) => {
-                                            if (subtask.id === targetSubtaskId) {
-                                                return {
-                                                    ...subtask,
-                                                    isCompleted: !subtask.isCompleted
-                                                }
-                                            }
-
-                                            return subtask
-                                        })
-                                    }
-                                })
-                            }
+                        if (column.id !== activeColumn.id) {
+                            return column
                         }
 
-                        return column
+                        return {
+                            ...column,
+                            tasks: column.tasks.map( (task) => {
+                                if (task.id !== activeTask.id) {
+                                    return task
+                                }
+                                
+                                return {
+                                    ...task,
+                                    subtasks: task.subtasks.map( (subtask) => {
+                                        if (subtask.id !== targetSubtaskId) {
+                                            return subtask
+                                        }
+                                        
+                                        return {
+                                            ...subtask,
+                                            isCompleted: !subtask.isCompleted
+                                        }
+                                    })
+                                }
+                            })
+                        }
+
                     })
                 }
             })
         )
     }
 
-    // Handle status (column) change on activetask
+    // Handle status (column) changes on activetask
     function handleStatusChange(targetColumnId: string) {
         // Check if activeColumn or activeTask don't exist so TypeScript doesn't complain
         if (!activeColumn || !activeTask) return
@@ -129,10 +131,10 @@ export default function ViewTask({activeTaskId, setActiveTaskId}: ViewTaskProps)
         // Update the location of activeTask in the current board
         setBoards( (prevBoards) =>
             prevBoards.map( (board) => {
-                // If the current board doesn't match the activeBoard (the one that is currently being updated) then just return the board as normal
-                if (board.id !== activeBoardId) return board
+                if (board.id !== activeBoardId) { 
+                    return board
+                }
 
-                // Otherwise, if on the correct board, start iterating
                 return {
                     ...board,
                     columns: board.columns.map( (column) => {
