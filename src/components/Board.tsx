@@ -1,6 +1,7 @@
 import { useState } from "react"
 // Components
 import ViewTask from "./ViewTask"
+import TaskModal from "./TaskModal"
 // Context
 import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
@@ -8,6 +9,7 @@ import { useActiveBoardId } from "./ActiveBoardContextId"
 export default function Board() {
     // State variables
     const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
+    const [editTaskId, setEditTaskId] = useState<string | null>(null)
 
     // Context
     const { boards } = useBoards()
@@ -77,7 +79,16 @@ export default function Board() {
             }
 
             {/* If a task is active (clicked on) render ViewTask */}
-            {activeTaskId && <ViewTask activeTaskId={activeTaskId} setActiveTaskId={setActiveTaskId}/>}
+            {
+                activeTaskId && 
+                <ViewTask activeTaskId={activeTaskId} setActiveTaskId={setActiveTaskId} setEditTaskId={setEditTaskId}/>
+            }
+
+            {/* Render TaskModal in edit mode */}
+            {
+                editTaskId &&
+                <TaskModal editTaskId={editTaskId} setEditTaskId={setEditTaskId}/>
+            }
         </main>
     )
 }

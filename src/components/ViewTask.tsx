@@ -8,10 +8,11 @@ import chevronDown from "../images/icon-chevron-down.svg"
 
 type ViewTaskProps = {
     activeTaskId: string,
-    setActiveTaskId: React.Dispatch<React.SetStateAction<string | null>>
+    setActiveTaskId: React.Dispatch<React.SetStateAction<string | null>>,
+    setEditTaskId: React.Dispatch<React.SetStateAction<string | null>>
 }
 
-export default function ViewTask({activeTaskId, setActiveTaskId}: ViewTaskProps) {
+export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId}: ViewTaskProps) {
     // State variables
     const [settingsOpen, setSettingsOpen] = useState(false) // Controls task settings box
     const [selectOpen, setSelectOpen] = useState(false) // Controls select box
@@ -167,6 +168,12 @@ export default function ViewTask({activeTaskId, setActiveTaskId}: ViewTaskProps)
         setSelectOpen(false)
     }
 
+    // Handle opening TaskForm in edit mode
+    function handleEditTask() {
+        setActiveTaskId(null)
+        setEditTaskId(activeTaskId)
+    }
+
     return (
         <div className="absolute inset-0 flex justify-center items-center p-4 bg-black/50">
             <div ref={viewTaskRef} className="z-10 flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-dark-grey">
@@ -184,8 +191,18 @@ export default function ViewTask({activeTaskId, setActiveTaskId}: ViewTaskProps)
 
                         {settingsOpen && 
                             <div className="absolute top-12 right-0 md:right-auto flex flex-col gap-y-4 w-27.5 md:w-48 py-4 bg-white rounded-lg shadow-lg dark:bg-very-dark-grey">
-                                <button className="w-full px-4 text-medium-grey text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:text-white hover:dark:bg-dark-grey">Edit task</button>
-                                <button className="w-full px-4 text-dark-red text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:bg-dark-grey">Delete task</button>
+                                <button
+                                    onClick={ () => handleEditTask() }                                 
+                                    className="w-full px-4 text-medium-grey text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:text-white hover:dark:bg-dark-grey"
+                                >
+                                    Edit task
+                                </button>
+
+                                <button 
+                                    className="w-full px-4 text-dark-red text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:bg-dark-grey"
+                                >
+                                    Delete task
+                                </button>
                             </div>
                         }
                     </div>
@@ -199,25 +216,30 @@ export default function ViewTask({activeTaskId, setActiveTaskId}: ViewTaskProps)
                     <h2 className="text-medium-grey text-body-m dark:text-white">Subtasks ({completedTasks.length} of {activeTask.subtasks.length})</h2>
 
                     <ul className="flex flex-col gap-y-2">
-                        {activeTask.subtasks.map( (subtask) => {
-                            return (
-                                <li 
-                                    className="bg-light-grey rounded-lg hover:bg-dark-purple/25 dark:bg-very-dark-grey dark:hover:bg-dark-purple/25" key={subtask.title}>
-                                    <label 
-                                        className="flex items-center gap-x-4 p-4 cursor-pointer"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={subtask.isCompleted}
-                                            onChange={ () => handleCheckboxChange(subtask.id) }
-                                            className="accent-dark-purple w-4 h-4 shrink-0 dark:accent-black"
-                                        />
+                        {
+                            activeTask.subtasks.length === 0 ? 
+                            <p className="-mt-2 text-medium-grey text-body-l">This task has no subtasks.</p> 
+                            :
+                            activeTask.subtasks.map( (subtask) => {
+                                return (
+                                    <li 
+                                        className="bg-light-grey rounded-lg hover:bg-dark-purple/25 dark:bg-very-dark-grey dark:hover:bg-dark-purple/25" key={subtask.title}>
+                                        <label 
+                                            className="flex items-center gap-x-4 p-4 cursor-pointer"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={subtask.isCompleted}
+                                                onChange={ () => handleCheckboxChange(subtask.id) }
+                                                className="accent-dark-purple w-4 h-4 shrink-0 dark:accent-black"
+                                            />
 
-                                        <span className={`${subtask.isCompleted ? "text-medium-grey line-through" : "text-black dark:text-white"} text-body-m`}>{subtask.title}</span>
-                                    </label>
-                                </li>
-                            )
-                        })}
+                                            <span className={`${subtask.isCompleted ? "text-medium-grey line-through" : "text-black dark:text-white"} text-body-m`}>{subtask.title}</span>
+                                        </label>
+                                    </li>
+                                )
+                            })
+                        }
                     </ul>
                 </div>
 
@@ -258,5 +280,3 @@ export default function ViewTask({activeTaskId, setActiveTaskId}: ViewTaskProps)
         </div>
     )
 }
-
-// Edit task and delete task functionality

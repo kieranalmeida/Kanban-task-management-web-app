@@ -1,7 +1,8 @@
 export type SubTask = {
     id: string,
     title: string,
-    isCompleted: boolean
+    isCompleted?: boolean,
+    placeholder?: string
 }
 
 export type Task = {
@@ -25,3 +26,16 @@ export type Board = {
 }
 
 export type Boards = Board[]
+
+// export type NewSubTask = {
+//     id: string,
+//     title: string,
+//     placeholder?: string
+// }
+
+export type TaskFormValues = {
+    title: string,
+    description: string,
+    subtasks: SubTask[]
+    targetColumnId: string
+}

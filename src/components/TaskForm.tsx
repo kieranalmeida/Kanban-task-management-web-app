@@ -6,14 +6,14 @@ import { useActiveBoardId } from "./ActiveBoardContextId"
 import chevronDown from "../images/icon-chevron-down.svg"
 import IconCross from "../images/icon-cross.svg?react"
 
-type AddTaskProps = {
-    setAddTaskOpen: React.Dispatch<React.SetStateAction<boolean>>
-}
+import type { SubTask, TaskFormValues } from "../types/types"
 
-type Subtask = {
-    id: string,
-    title: string,
-    placeholder?: string
+type TaskFormProps = {
+    initialValues: TaskFormValues
+    formHeading: string,
+    formButtonText: string,
+    onSubmit: ( {title, description, subtasks, targetColumnId}: TaskFormValues) => void,
+    onClose: () => void
 }
 
 type FormErrors = {
@@ -22,51 +22,67 @@ type FormErrors = {
     [key: `subtask-${string}`]: string | undefined
 }
 
-export default function AddTask({setAddTaskOpen}: AddTaskProps) {
+export default function TaskForm({initialValues, formHeading, formButtonText, onSubmit, onClose}: TaskFormProps) {
     // Refs
-    const addTaskRef = useRef<HTMLDivElement | null>(null)
-    const selectBoxRef = useRef<HTMLDivElement | null>(null) 
+    const taskFormRef = useRef<HTMLDivElement | null>(null)
+    const selectBoxRef = useRef<HTMLDivElement | null>(null)
     
     // Context
-    const { boards, setBoards } = useBoards() // Controls boards
+    const { boards } = useBoards() // Controls boards
     const { activeBoardId } = useActiveBoardId() // Controls active board ID
-    
-    // Derived values
-    const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
     
     // State variables
     const [formErrors, setFormErrors] = useState<FormErrors>({})
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
-    const [subtasks, setSubtasks] = useState<Subtask[]>(
-        [
-            {
-                id: crypto.randomUUID(),
-                title: "",
-                placeholder: "e.g. Make coffee"
-            },
-                        {
-                id: crypto.randomUUID(),
-                title: "",
-                placeholder: "e.g. Drink coffee & smile"
-            }
-        ]
-    )
+    
+    const [title, setTitle] = useState(initialValues.title)
+    const [description, setDescription] = useState(initialValues.description)
+    const [subtasks, setSubtasks] = useState<SubTask[]>(initialValues.subtasks)
+    const [targetColumnId, setTargetColumnId] = useState(initialValues.targetColumnId) // Controls the id of the target column (the one chosen in the form select box)
+    
     const [selectOpen, setSelectOpen] = useState(false) // Controls select box
-    const [targetColumnId, setTargetColumnId] = useState( activeBoard?.columns[0].id) // Controls the id of the target column (the one chosen in the form select box)
     
     // Derived values
-    const targetColumn = activeBoard?.columns.find( (column) => column.id === targetColumnId)
+    const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
+    const targetColumn = activeBoard?.columns.find( (column) => column.id === targetColumnId) // Get target column
+
+    // Handle form submission
+    function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+        // Prevent page refresh and form reset
+        e.preventDefault()
+        
+        // Empty error object to keep track of errors on each input
+        let newErrors: FormErrors = {}
+
+        // Check for errors on each input
+        if (!title) { newErrors.title = "Can't be empty" }
+        if (!description) { newErrors.description = "Can't be empty" }
+        subtasks.forEach( (subtask) => {
+            if (!subtask.title) {
+                newErrors[`subtask-${subtask.id}`] = "Can't be empty"
+            }
+        })
+
+        // Set the formErrors state to the newErrors object. Any key that exists will trigger a custom error message
+        setFormErrors(newErrors)
+        
+        // To satisfy TypeScript, return early if title, description, targetColumn or a subtask title do not exist
+        if (!title || !description || !targetColumn || subtasks.some( (subtask) => !subtask.title)) {
+            return
+        }
+
+        // Perform handleAddTask if in add mode or handleEditTask if in edit mode
+        onSubmit( {title, description, targetColumnId, subtasks} )
+    }
 
     // Handle outside clicks
     useEffect( () => {
         function handleClickOutside(event: MouseEvent) {
-            // addTask menu
+            // taskForm menu
             if (
-                addTaskRef.current 
-                && !addTaskRef.current.contains(event.target as Node)
+                taskFormRef.current 
+                && !taskFormRef.current.contains(event.target as Node)
             ) {
-                setAddTaskOpen(false)
+               onClose()
             }
 
             // Select box
@@ -173,79 +189,10 @@ export default function AddTask({setAddTaskOpen}: AddTaskProps) {
         setSelectOpen(false)
     }
 
-    console.log(formErrors)
-
-    // Handle form submission
-    function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-        // Prevent page refresh and form reset
-        e.preventDefault()
-        
-        // Empty error object to keep track of errors on each input
-        let newErrors: FormErrors = {}
-
-        // Check for errors on each input
-        if (!title) { newErrors.title = "Can't be empty" }
-        if (!description) { newErrors.description = "Can't be empty" }
-        subtasks.forEach( (subtask) => {
-            if (!subtask.title) {
-                newErrors[`subtask-${subtask.id}`] = "Can't be empty"
-            }
-        })
-
-        // Set the formErrors state to the newErrors object. Any key that exists will trigger a custom error message
-        setFormErrors(newErrors)
-        
-        // To satisfy TypeScript, return early if title, description, targetColumn or a subtask title do not exist
-        if (!title || !description || !targetColumn || subtasks.some( (subtask) => !subtask.title)) {
-            return
-        }
-
-        // Create the new task from the form data
-        const newTask = {
-            id: crypto.randomUUID(),
-            title,
-            description,
-            status: targetColumn.name,
-            subtasks: subtasks.map( (subtask) => (
-                {
-                    id: crypto.randomUUID(),
-                    title: subtask.title,
-                    isCompleted: false
-                }
-            ))
-        }
-        
-        // Insert the new task into the selected column in the active board
-        setBoards( (prevBoards) => 
-            prevBoards.map( (board) => {
-                if (board.id !== activeBoard?.id) {
-                    return board
-                }
-
-                return {
-                    ...board,
-                    columns: board.columns.map( (column) => {
-                        if (column.id !== targetColumn?.id) {
-                            return column
-                        }
-
-                        return {
-                            ...column,
-                            tasks: [...column.tasks, newTask]
-                        }
-                    })
-                }
-            })
-        )
-
-        // Close AddTask
-        setAddTaskOpen(false)
-    }
-
     return (
         <div className="absolute z-10 inset-0 flex justify-center items-center p-4 bg-black/50">
-            <div ref={addTaskRef} className="flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-very-dark-grey">
-                <h2 className="text-black text-heading-l dark:text-white">Add New Task</h2>
+            <div ref={taskFormRef} className="flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-very-dark-grey">
+                <h2 className="text-black text-heading-l dark:text-white">{formHeading}</h2>
 
                 <form 
                     onSubmit={handleSubmit}
@@ -409,7 +356,7 @@ export default function AddTask({setAddTaskOpen}: AddTaskProps) {
                         type="submit"
                         className="w-full py-2 text-white text-[0.8125rem] font-bold leading-5.75 bg-dark-purple rounded-full cursor-pointer hover:bg-light-purple"
                     >
-                        Create Task    
+                        {formButtonText}
                     </button>
                 </form>
             </div>

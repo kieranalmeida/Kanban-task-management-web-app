@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { Link } from "react-router-dom"
 // Components
 import ThemeSwitch from "./ThemeSwitch"
-import AddTask from "./AddTask"
+import TaskModal from "./TaskModal"
 // Context
 import { useTheme } from "./ThemeContext"
 import { useSidebar } from "./SidebarContext"
@@ -174,7 +174,11 @@ export default function Header() {
                 </div>
             }
 
-            {addTaskOpen && <AddTask setAddTaskOpen={setAddTaskOpen}/>}
+            {/* Render TaskModal in add mode */}
+            {
+                addTaskOpen && 
+                <TaskModal addTaskOpen={addTaskOpen} setAddTaskOpen={setAddTaskOpen}/>
+            }
         </header>
     )
 }
