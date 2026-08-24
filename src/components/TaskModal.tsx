@@ -1,8 +1,10 @@
 // Components
 import TaskForm from "./TaskForm"
+
 // Context
 import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
+
 // Types
 import type { TaskFormValues } from "../types/types"
 
@@ -29,7 +31,10 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
     
     // Derived values
     const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
-    const defaultColumnId = activeBoard?.columns[0].id // Get the default column id (the first column in the activeBoard) for when TaskModal is in add mode
+    const defaultColumnId = activeBoard?.columns[0].id // Get the the id of the first column in the active board to set the default column in the add task select box
+    const activeTask = activeBoard?.columns.flatMap( (column) => column.tasks).find( (task) => task.id === editTaskId) // Get the task being edited
+    const activeColumn = activeBoard?.columns?.find( (column) => column.tasks.some( (task) => task.id === editTaskId) ) // Get active column (the one the task being edited is in before being updated)
+
     if (!defaultColumnId) return
 
     // Empty task form for when TaskForm is rendered in add mode (used to set initial state values)
@@ -53,8 +58,6 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
 
     // Get initial form values when TaskForm is in edit mode
     function getEditTaskFormValues() {
-        const activeTask = activeBoard?.columns.flatMap( (column) => column.tasks).find( (task) => task.id === editTaskId) // Get the task being edited
-        const activeColumn = activeBoard?.columns?.find( (column) => column.tasks.some( (task) => task.id === editTaskId) ) // Get the active column (the one the task being edited is in)
         if (!activeTask || !activeColumn) return
         
         const editTaskFormValues = {
@@ -67,6 +70,7 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
         return editTaskFormValues
     }
 
+    // Handle adding the new task when in add mode
     function handleAddTask( {title, description, targetColumnId, subtasks}: TaskFormValues) {
         const targetColumn = activeBoard?.columns.find( (column) => column.id === targetColumnId) // Get the target column (the one that the task being created will be added to)
         if (!targetColumn) return
@@ -113,11 +117,10 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
         setAddTaskOpen!(false)
     }
 
+    // Handle editing the task when in edit mode
     function handleEditTask( {title, description, targetColumnId, subtasks}: TaskFormValues) {
-        const activeTask = activeBoard?.columns.flatMap( (column) => column.tasks).find( (task) => task.id === editTaskId) // Get the task being edited
-        const activeColumn = activeBoard?.columns?.find( (column) => column.tasks.some( (task) => task.id === editTaskId) ) // Get active column (the one the task being edited is in before being updated)
         const targetColumn = activeBoard?.columns.find( (column) => column.id === targetColumnId) // Get the target column (the one that the task being edited is in or being moved to)
-        if (!activeTask || !activeColumn || !targetColumn) return
+        if (!targetColumn || !activeTask || !activeColumn) return
         
         // Updated task values (id does not change)
         const updatedTask = {
@@ -128,10 +131,7 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
             subtasks
         }
         
-        // If the current column id matches the active column id and target column id, update the task
-        // If the current column id matches the active column id but not the target column id, remove the task
-        // If the current column id doesn't match the active column id but matches the target column id, add the task
-        // If the current column isn't the active or target column, return the column
+        // Edit the task and move it if necessary
         setBoards( (prevBoards) =>
             prevBoards.map( (board) => {
                 if (board.id !== activeBoardId) {
@@ -141,7 +141,7 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
                 return {
                     ...board,
                     columns: board.columns.map( (column) => {
-                        // update task in place
+                        // If the current column id matches both the active column id and target column id, update the task in place
                         if (column.id === activeColumn.id && column.id === targetColumn.id) {
                             return {
                                 ...column,
@@ -155,7 +155,7 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
                             }
                         }
 
-                        // remove task from old column
+                        // If the current column id matches the active column id but not the target column id, remove the task
                         if (column.id === activeColumn.id && column.id !== targetColumn.id) {
                             return {
                                 ...column,
@@ -163,7 +163,7 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
                             }
                         }
 
-                        // add task to new column
+                        // If the current column id doesn't match the active column id but matches the target column id, add the task
                         if (column.id !== activeColumn.id && column.id === targetColumn.id) {
                             return {
                                 ...column,
@@ -171,7 +171,7 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
                             }
                         }
 
-                        // return normal column
+                        // If the current column isn't the active or target column, return the column as normal
                         return column
                     })
                 }
@@ -182,6 +182,7 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
         setEditTaskId!(null)
     }
 
+    // If editTaskId exists, get the edit form values. Otherwise, return undefined. If undefined, TaskForm cannot render in edit mode. If not checking the existence of initialValues before trying to render TaskForm, TypeScript will complain.
     const editTaskFormValues = editTaskId ? getEditTaskFormValues() : undefined
 
     return (
@@ -201,13 +202,13 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
 
             {/* Render TaskForm in edit mode */}
             {
-                editTaskFormValues && (
+                (editTaskId && editTaskFormValues) && (
                     <TaskForm
                         initialValues={editTaskFormValues} 
                         formHeading="Edit Task"
                         formButtonText="Save Changes"
                         onSubmit={handleEditTask}
-                        onClose={ () => setEditTaskId!(null) }
+                        onClose={ () => setEditTaskId(null) }
                     />
                 )
             }

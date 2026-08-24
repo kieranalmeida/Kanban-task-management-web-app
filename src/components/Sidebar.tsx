@@ -1,10 +1,16 @@
+// Hooks
 import { useState, useEffect } from "react"
+
+// Context
 import { useSidebar } from "./SidebarContext"
+
 // Components
 import ThemeSwitch from "./ThemeSwitch"
+
 // Context
 import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
+
 // Images
 import BoardIcon from "../images/icon-board.svg?react"
 import lightThemeIcon from "../images/icon-light-theme.svg"

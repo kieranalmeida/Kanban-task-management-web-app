@@ -1,15 +1,20 @@
+// Hooks
 import { useState, useEffect } from "react"
 import { Outlet } from "react-router-dom"
+
 // Components
 import Header from "./Header"
 import Sidebar from "./Sidebar"
+
 // Context
 import { ThemeContext } from "./ThemeContext"
 import { SidebarContext } from "./SidebarContext"
 import { BoardsContext } from "./BoardsContext"
 import { ActiveBoardIdContext } from "./ActiveBoardContextId"
+
 // Data
 import data from "../data/data.json"
+
 // Types
 import type { Boards } from "../types/types"
 

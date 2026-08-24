@@ -1,7 +1,10 @@
+// Hooks
 import { useState, useRef, useEffect } from "react"
+
 // Context
 import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
+
 // Images
 import verticalEllipsis from "../images/icon-vertical-ellipsis.svg"
 import chevronDown from "../images/icon-chevron-down.svg"
@@ -33,6 +36,7 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId}:
     
     // If activeTask or activeColumn don't exist, return so that TypeScript doesn't complain
     if (!activeTask || !activeColumn) return
+
     const completedTasks = activeTask?.subtasks.filter( (subtask) => subtask.isCompleted === true) // Get the amount of completed subtasks for the current task
     
     // Handle outside clicks

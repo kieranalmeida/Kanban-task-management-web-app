@@ -1,11 +1,15 @@
+// Hooks
 import { useState, useRef, useEffect} from "react"
+
 // Context
 import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
+
 // Images
 import chevronDown from "../images/icon-chevron-down.svg"
 import IconCross from "../images/icon-cross.svg?react"
 
+// Types
 import type { SubTask, TaskFormValues } from "../types/types"
 
 type TaskFormProps = {
@@ -32,18 +36,132 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
     const { activeBoardId } = useActiveBoardId() // Controls active board ID
     
     // State variables
-    const [formErrors, setFormErrors] = useState<FormErrors>({})
-    
     const [title, setTitle] = useState(initialValues.title)
     const [description, setDescription] = useState(initialValues.description)
     const [subtasks, setSubtasks] = useState<SubTask[]>(initialValues.subtasks)
     const [targetColumnId, setTargetColumnId] = useState(initialValues.targetColumnId) // Controls the id of the target column (the one chosen in the form select box)
-    
     const [selectOpen, setSelectOpen] = useState(false) // Controls select box
+    const [formErrors, setFormErrors] = useState<FormErrors>({}) // Controls form errors to render custom error messages
     
     // Derived values
     const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
     const targetColumn = activeBoard?.columns.find( (column) => column.id === targetColumnId) // Get target column
+
+    // Handle outside clicks
+    useEffect( () => {
+        function handleClickOutside(event: MouseEvent) {
+            // taskForm menu
+            if (
+                taskFormRef.current 
+                && !taskFormRef.current.contains(event.target as Node)
+            ) {
+               onClose()
+            }
+
+            // Select box
+            if (
+                selectBoxRef.current 
+                && !selectBoxRef.current.contains(event.target as Node)
+            ) {
+                setSelectOpen(false)
+            }
+        }
+        
+        document.addEventListener("mousedown", handleClickOutside)
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside)
+        }
+    }, [])
+    
+    
+    // Handle title input change
+    function handleTitleChange(value: string) {
+        setTitle(value)
+        
+        // If there's an error key for title, but title has since been updated, remove the error key
+        if (formErrors.title && title) {
+            setFormErrors( (prevFormErrors) => {
+                const {title, ...rest} = prevFormErrors
+                
+                return {
+                    ...rest
+                }
+            })
+        }
+    }
+    
+    // Handle description input change
+    function handleDescriptionChange(value: string) {
+        setDescription(value)
+        
+        // If there's an error key for description, but description has since been updated, remove the error key
+        if (formErrors.description && description) {
+            setFormErrors( (prevFormErrors) => {
+                const {description, ...rest} = prevFormErrors
+                
+                return {
+                    ...rest
+                }
+            })
+        }
+    }
+    
+    // Handle subtask input change
+    function handleSubtaskChange(subtaskId: string, value: string) {
+        setSubtasks( (prevSubtasks) => 
+            prevSubtasks.map( (subtask) => {
+                if (subtask.id !== subtaskId) {
+                    return subtask
+                }
+                
+                return {
+                    ...subtask, title: value
+                }
+            })
+        )
+        
+        // Without this, TypeScript will complain
+        const currentSubtask = `subtask-${subtaskId}` as const
+        
+        // If there's an error key for a subtask, but that subtask has since been updated, remove the error key
+        if (formErrors[currentSubtask] && value) {
+            setFormErrors( (prevFormErrors) => {
+                const {[currentSubtask]: _, ...rest} = prevFormErrors
+                
+                return {
+                    ...rest
+                }
+            })
+        }
+    }
+    
+    // Handle adding subtasks
+    function handleAddSubtask() {
+        const newSubtask = {
+            id: crypto.randomUUID(),
+            title: ""
+        }
+        
+        setSubtasks( (prevSubtasks) => [...prevSubtasks, newSubtask])
+    }
+    
+    // Handle subtask deletion
+    function handleSubtaskDelete(subtaskId: string) {
+        // Update the subtasks array to include every subtask except the one being deleted
+        setSubtasks( (prevSubtasks) => {
+            return prevSubtasks.filter( (subtask) => subtask.id !== subtaskId)
+        })
+    }
+    
+    // Handle the select box options
+    function handleSelectBox(columnId: string) {
+        // Update targetColumnId
+        setTargetColumnId(columnId)
+        
+        // Close the select box
+        setSelectOpen(false)
+    }
 
     // Handle form submission
     function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
@@ -73,122 +191,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
         // Perform handleAddTask if in add mode or handleEditTask if in edit mode
         onSubmit( {title, description, targetColumnId, subtasks} )
     }
-
-    // Handle outside clicks
-    useEffect( () => {
-        function handleClickOutside(event: MouseEvent) {
-            // taskForm menu
-            if (
-                taskFormRef.current 
-                && !taskFormRef.current.contains(event.target as Node)
-            ) {
-               onClose()
-            }
-
-            // Select box
-            if (
-                selectBoxRef.current 
-                && !selectBoxRef.current.contains(event.target as Node)
-            ) {
-                setSelectOpen(false)
-            }
-        }
-        
-        document.addEventListener("mousedown", handleClickOutside)
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside)
-        }
-    }, [])
     
-    // Handle title change
-    function handleTitleChange(value: string) {
-        setTitle(value)
-        
-        // If there's an error key for title, but title has since been updated, remove the error key
-        if (formErrors.title && title) {
-            setFormErrors( (prevFormErrors) => {
-                const {title, ...rest} = prevFormErrors
-    
-                return {
-                    ...rest
-                }
-            })
-        }
-    }
-    
-    // Handle description change
-    function handleDescriptionChange(value: string) {
-        setDescription(value)
-        
-        // If there's an error key for description, but description has since been updated, remove the error key
-        if (formErrors.description && description) {
-            setFormErrors( (prevFormErrors) => {
-                const {description, ...rest} = prevFormErrors
-    
-                return {
-                    ...rest
-                }
-            })
-        }
-    }
-    
-    // Handle subtask change
-    function handleSubtaskChange(subtaskId: string, value: string) {
-        setSubtasks( (prevSubtasks) => 
-            prevSubtasks.map( (subtask) => {
-                if (subtask.id !== subtaskId) {
-                    return subtask
-                }
-                
-                return {
-                    ...subtask, title: value
-                }
-            })
-        )
-
-        // Without this, TypeScript will complain
-        const currentSubtask = `subtask-${subtaskId}` as const
-
-        // If there's an error key for a subtask, but that subtask has since been updated, remove the error key
-        if (formErrors[currentSubtask] && value) {
-            setFormErrors( (prevFormErrors) => {
-                const {[currentSubtask]: _, ...rest} = prevFormErrors
-
-                return {
-                    ...rest
-                }
-            })
-        }
-    }
-    
-    // Handle adding subtasks
-    function handleAddSubtask() {
-        const newSubtask = {
-            id: crypto.randomUUID(),
-            title: ""
-        }
-        
-        setSubtasks( (prevSubtasks) => [...prevSubtasks, newSubtask])
-    }
-
-    // Handle subtask deletion
-    function handleSubtaskDelete(subtaskId: string) {
-        // Update the subtasks array to include every subtask except the one being deleted
-        setSubtasks( (prevSubtasks) => {
-            return prevSubtasks.filter( (subtask) => subtask.id !== subtaskId)
-        })
-    }
-
-    // Handle the select box options
-    function handleSelectBox(columnId: string) {
-        // Update targetColumnId
-        setTargetColumnId(columnId)
-
-        // Close the select box
-        setSelectOpen(false)
-    }
-
     return (
         <div className="absolute z-10 inset-0 flex justify-center items-center p-4 bg-black/50">
             <div ref={taskFormRef} className="flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-very-dark-grey">
@@ -198,7 +201,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
                     onSubmit={handleSubmit}
                     noValidate
                     className="flex flex-col gap-y-6" 
-                >
+                    >
                     {/* Title */}
                     <div className="flex flex-col gap-y-2">
                         <label 

@@ -27,12 +27,6 @@ export type Board = {
 
 export type Boards = Board[]
 
-// export type NewSubTask = {
-//     id: string,
-//     title: string,
-//     placeholder?: string
-// }
-
 export type TaskFormValues = {
     title: string,
     description: string,

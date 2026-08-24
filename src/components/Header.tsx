@@ -1,13 +1,17 @@
+// Hooks
 import { useState, useRef, useEffect } from "react"
 import { Link } from "react-router-dom"
+
 // Components
 import ThemeSwitch from "./ThemeSwitch"
 import TaskModal from "./TaskModal"
+
 // Context
 import { useTheme } from "./ThemeContext"
 import { useSidebar } from "./SidebarContext"
 import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
+
 // Images
 import logoMobile from "../images/logo-mobile.svg"
 import logoLight from "../images/logo-light.svg"
