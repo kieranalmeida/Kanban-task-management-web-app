@@ -27,6 +27,11 @@ export type Board = {
 
 export type Boards = Board[]
 
+export type BoardFormValues = {
+    name: string,
+    columns: Column[]
+}
+
 export type TaskFormValues = {
     title: string,
     description: string,

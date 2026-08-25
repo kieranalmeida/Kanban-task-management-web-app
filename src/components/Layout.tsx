@@ -11,6 +11,7 @@ import { ThemeContext } from "./ThemeContext"
 import { SidebarContext } from "./SidebarContext"
 import { BoardsContext } from "./BoardsContext"
 import { ActiveBoardIdContext } from "./ActiveBoardContextId"
+import { BoardModalContext } from "./BoardModalContext"
 
 // Data
 import data from "../data/data.json"
@@ -50,6 +51,11 @@ export default function Layout() {
     // Controls the active board
     const [activeBoardId, setActiveBoardId] = useState<string>( () => boards[0].id)
 
+    // Controls add board form
+    const [addBoardOpen, setAddBoardOpen] = useState(false)
+    // Controls edit board form
+    const [editBoardOpen, setEditBoardOpen] = useState(false)
+
     // When darkMode changes, update the value saved in local storage. toString() is used to satisfy TypeScript
     useEffect( () => {
         localStorage.setItem("darkMode", darkMode.toString() )
@@ -58,20 +64,21 @@ export default function Layout() {
     return (
         <ThemeContext.Provider value={ {darkMode, setDarkMode} }>
             <SidebarContext.Provider value={ {sidebarOpen, setSidebarOpen} }>
-                    <BoardsContext.Provider value={ {boards, setBoards} }>
-                        <ActiveBoardIdContext.Provider value={ {activeBoardId, setActiveBoardId} }>
+                <BoardsContext.Provider value={ {boards, setBoards} }>
+                    <ActiveBoardIdContext.Provider value={ {activeBoardId, setActiveBoardId} }>
+                        <BoardModalContext.Provider value={ {addBoardOpen, setAddBoardOpen, editBoardOpen, setEditBoardOpen} }>
+                                
+                            {/* If darkMode is enabled, apply "dark" to this div, which wraps the entire website, activating the @custom-variant in the CSS */}
+                            <div className={`${darkMode ? "dark" : ""} flex flex-col h-screen`}>
+                                <Header/>
 
-
-                    {/* If darkMode is enabled, apply "dark" to this div, which wraps the entire website, activating the @custom-variant in the CSS */}
-                    <div className={`${darkMode ? "dark" : ""} flex flex-col h-screen`}>
-                        <Header/>
-
-                        <div className="flex flex-1 min-h-0">
-                            <Sidebar/>
-                            <Outlet />
-                        </div>
-                    </div>
+                                <div className="flex flex-1 min-h-0">
+                                    <Sidebar/>
+                                    <Outlet />
+                                </div>
+                            </div>
                     
+                        </BoardModalContext.Provider>
                     </ActiveBoardIdContext.Provider>
                 </BoardsContext.Provider>
             </SidebarContext.Provider>

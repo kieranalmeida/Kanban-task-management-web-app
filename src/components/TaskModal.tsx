@@ -113,7 +113,7 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
             })
         )
 
-        // Close add task form
+        // Close the add task form
         setAddTaskOpen!(false)
     }
 
@@ -131,7 +131,7 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
             subtasks
         }
         
-        // Edit the task and move it if necessary
+        // Update the task and move it if necessary
         setBoards( (prevBoards) =>
             prevBoards.map( (board) => {
                 if (board.id !== activeBoardId) {
@@ -178,7 +178,7 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
             })
         )
 
-        // Close edit task form
+        // Close the edit task form
         setEditTaskId!(null)
     }
 

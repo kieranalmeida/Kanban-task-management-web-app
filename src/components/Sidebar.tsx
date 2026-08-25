@@ -1,15 +1,15 @@
 // Hooks
 import { useState, useEffect } from "react"
 
-// Context
-import { useSidebar } from "./SidebarContext"
-
 // Components
 import ThemeSwitch from "./ThemeSwitch"
+import BoardModal from "./BoardModal"
 
 // Context
+import { useSidebar } from "./SidebarContext"
 import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
+import { useBoardModalContext } from "./BoardModalContext"
 
 // Images
 import BoardIcon from "../images/icon-board.svg?react"
@@ -24,8 +24,9 @@ export default function Sidebar() {
 
     // Context
     const { sidebarOpen, setSidebarOpen } = useSidebar()
-    const { boards } = useBoards() //
+    const { boards } = useBoards()
     const { activeBoardId, setActiveBoardId } = useActiveBoardId()
+    const { addBoardOpen, setAddBoardOpen } = useBoardModalContext()
 
     // Derived values
     const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
@@ -80,7 +81,7 @@ export default function Sidebar() {
                                 {boardButtons}
                             </ul>
 
-                            <button className="flex items-center gap-x-3 w-full text-dark-purple text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer">
+                            <button onClick={ () => setAddBoardOpen(true) }className="flex items-center gap-x-3 w-full text-dark-purple text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer">
                                 <BoardIcon/>
                                 + Create New Board
                             </button>
@@ -107,6 +108,12 @@ export default function Sidebar() {
                         <ShowSidebarIcon />
                     </button>
                 )
+            }
+
+            {/* Render BoardModal in add mode */}
+            {
+                addBoardOpen &&
+                <BoardModal addBoardOpen={addBoardOpen} setAddBoardOpen={setAddBoardOpen}/>
             }
         </>
     )

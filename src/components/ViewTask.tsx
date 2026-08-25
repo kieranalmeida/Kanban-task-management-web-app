@@ -21,7 +21,6 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId}:
     const [selectOpen, setSelectOpen] = useState(false) // Controls select box
 
     // Refs
-    const viewTaskRef = useRef<HTMLDivElement | null>(null)
     const settingsRef = useRef<HTMLDivElement | null>(null)
     const selectBoxRef = useRef<HTMLDivElement | null>(null) 
 
@@ -41,15 +40,7 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId}:
     
     // Handle outside clicks
     useEffect( () => {
-        function handleClickOutside(event: MouseEvent) {
-            // ViewTask menu
-            if (
-                viewTaskRef.current 
-                && !viewTaskRef.current.contains(event.target as Node)
-            ) {
-                setActiveTaskId(null)
-            }
-
+        function handleOutsideClick(event: MouseEvent) {
             // Task settings
             if (
                 settingsRef.current 
@@ -67,10 +58,10 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId}:
             }
         }
         
-        document.addEventListener("mousedown", handleClickOutside)
+        document.addEventListener("mousedown", handleOutsideClick)
 
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside)
+            document.removeEventListener("mousedown", handleOutsideClick)
         }
     }, [])
 
@@ -179,8 +170,11 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId}:
     }
 
     return (
-        <div className="absolute inset-0 flex justify-center items-center p-4 bg-black/50">
-            <div ref={viewTaskRef} className="z-10 flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-dark-grey">
+        <div 
+            onClick={ (e) => { if (e.target === e.currentTarget) setActiveTaskId(null) } }
+            className="absolute inset-0 flex justify-center items-center p-4 bg-black/50"
+        >
+            <div className="z-10 flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-dark-grey">
                 {/* Heading and settings button */}
                 <div className="flex justify-between items-center gap-x-6">
                     <h2 className="text-black text-heading-l dark:text-white">{activeTask.title}</h2>

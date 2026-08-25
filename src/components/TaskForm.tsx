@@ -20,28 +20,27 @@ type TaskFormProps = {
     onClose: () => void
 }
 
-type FormErrors = {
+type TaskFormErrors = {
     title?: string,
     description?: string
     [key: `subtask-${string}`]: string | undefined
 }
 
 export default function TaskForm({initialValues, formHeading, formButtonText, onSubmit, onClose}: TaskFormProps) {
-    // Refs
-    const taskFormRef = useRef<HTMLDivElement | null>(null)
-    const selectBoxRef = useRef<HTMLDivElement | null>(null)
-    
-    // Context
-    const { boards } = useBoards() // Controls boards
-    const { activeBoardId } = useActiveBoardId() // Controls active board ID
-    
     // State variables
     const [title, setTitle] = useState(initialValues.title)
     const [description, setDescription] = useState(initialValues.description)
     const [subtasks, setSubtasks] = useState<SubTask[]>(initialValues.subtasks)
     const [targetColumnId, setTargetColumnId] = useState(initialValues.targetColumnId) // Controls the id of the target column (the one chosen in the form select box)
     const [selectOpen, setSelectOpen] = useState(false) // Controls select box
-    const [formErrors, setFormErrors] = useState<FormErrors>({}) // Controls form errors to render custom error messages
+    const [formErrors, setFormErrors] = useState<TaskFormErrors>({}) // Controls form errors to render custom error messages
+
+    // Refs
+    const selectBoxRef = useRef<HTMLDivElement | null>(null)
+    
+    // Context
+    const { boards } = useBoards() // Controls boards
+    const { activeBoardId } = useActiveBoardId() // Controls active board ID
     
     // Derived values
     const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
@@ -49,15 +48,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
 
     // Handle outside clicks
     useEffect( () => {
-        function handleClickOutside(event: MouseEvent) {
-            // taskForm menu
-            if (
-                taskFormRef.current 
-                && !taskFormRef.current.contains(event.target as Node)
-            ) {
-               onClose()
-            }
-
+        function handleOutsideClick(event: MouseEvent) {
             // Select box
             if (
                 selectBoxRef.current 
@@ -67,13 +58,12 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
             }
         }
         
-        document.addEventListener("mousedown", handleClickOutside)
+        document.addEventListener("mousedown", handleOutsideClick)
 
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside)
+            document.removeEventListener("mousedown", handleOutsideClick)
         }
     }, [])
-    
     
     // Handle title input change
     function handleTitleChange(value: string) {
@@ -169,7 +159,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
         e.preventDefault()
         
         // Empty error object to keep track of errors on each input
-        let newErrors: FormErrors = {}
+        let newErrors: TaskFormErrors = {}
 
         // Check for errors on each input
         if (!title) { newErrors.title = "Can't be empty" }
@@ -193,15 +183,18 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
     }
     
     return (
-        <div className="absolute z-10 inset-0 flex justify-center items-center p-4 bg-black/50">
-            <div ref={taskFormRef} className="flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-very-dark-grey">
+        <div 
+            onClick={ (e) => { if (e.target === e.currentTarget) onClose() } }
+            className="absolute z-10 inset-0 flex justify-center items-center p-4 bg-black/50"
+        >
+            <div className="flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-very-dark-grey">
                 <h2 className="text-black text-heading-l dark:text-white">{formHeading}</h2>
 
                 <form 
                     onSubmit={handleSubmit}
                     noValidate
                     className="flex flex-col gap-y-6" 
-                    >
+                >
                     {/* Title */}
                     <div className="flex flex-col gap-y-2">
                         <label 

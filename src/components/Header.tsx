@@ -5,12 +5,14 @@ import { Link } from "react-router-dom"
 // Components
 import ThemeSwitch from "./ThemeSwitch"
 import TaskModal from "./TaskModal"
+import BoardModal from "./BoardModal"
 
 // Context
 import { useTheme } from "./ThemeContext"
 import { useSidebar } from "./SidebarContext"
 import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
+import { useBoardModalContext } from "./BoardModalContext"
 
 // Images
 import logoMobile from "../images/logo-mobile.svg"
@@ -26,40 +28,22 @@ import darkThemeIcon from "../images/icon-dark-theme.svg"
 export default function Header() {
     // State variables
     const [menuOpen, setMenuOpen] = useState(false) // Controls header mobile menu
+    const [settingsOpen, setSettingsOpen] = useState(false) // Controls task settings box
     const [addTaskOpen, setAddTaskOpen] = useState(false) // Controls add task menu
 
     // Refs
-    const menuRef = useRef<HTMLDivElement | null>(null) // Used to handle outside clicks for header mobile menu
+    const settingsRef = useRef<HTMLDivElement | null>(null)
     
     // Context
     const { darkMode } = useTheme()
     const { sidebarOpen } = useSidebar()
     const { boards } = useBoards()
     const { activeBoardId, setActiveBoardId } = useActiveBoardId() // Controls active board ID
+    const { addBoardOpen, setAddBoardOpen, editBoardOpen, setEditBoardOpen } = useBoardModalContext() // Controls board modal
 
     // Derived values
     const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
     const boardsNum = boards.length // Get amount of boards
-
-    // Handle outside clicks when menu is open
-    useEffect( () => {
-        function handleClickOutside(event: MouseEvent) {
-            if (
-                menuRef.current 
-                && !menuRef.current.contains(event.target as Node)
-            ) {
-                setMenuOpen(false)
-            }
-        }
-        
-        if (menuOpen) {
-            document.addEventListener("mousedown", handleClickOutside)
-        }
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside)
-        }
-    }, [menuOpen])
 
     // Close menu automatically (if open) when screen size increases
     useEffect( () => {
@@ -77,6 +61,36 @@ export default function Header() {
             media.removeEventListener("change", closeMenu)
         }
     }, [menuOpen])
+
+    // Handle outside clicks
+    useEffect( () => {
+        function handleOutsideClick(event: MouseEvent) {
+            // Board settings
+            if (
+                settingsRef.current 
+                && !settingsRef.current.contains(event.target as Node)
+            ) {
+                setSettingsOpen(false)
+            }
+        }
+        
+        document.addEventListener("mousedown", handleOutsideClick)
+
+        return () => {
+            document.removeEventListener("mousedown", handleOutsideClick)
+        }
+    }, [])
+
+    // Handle opening BoardModal in add mode
+    function handleAddBoard() {
+        setMenuOpen(false)
+        setAddBoardOpen(true)
+    }
+
+    function handleEditBoard() {
+        setSettingsOpen(false)
+        setEditBoardOpen(true)
+    }
     
     // Board button normal + active styling
     const boardButtonClass = (name: string) => `
@@ -143,16 +157,38 @@ export default function Header() {
                         + Add New Task
                     </button>
 
-                    <button className="px-3 py-1.5 md:px-4 md:py-2 cursor-pointer hover:bg-lines-light hover:rounded-full dark:hover:bg-lines-dark">
-                        <img className="w-[3.7px] md:w-[4.6px]" src={verticalEllipsis} alt="View board settings"/>
-                    </button>
+                    <div ref={settingsRef} className="relative">
+                        <button onClick={ () => setSettingsOpen(!settingsOpen) } className="px-3 py-1.5 md:px-4 md:py-2 cursor-pointer hover:bg-lines-light hover:rounded-full dark:hover:bg-lines-dark">
+                            <img className="w-[3.7px] md:w-[4.6px]" src={verticalEllipsis} alt="View board settings"/>
+                        </button>
+
+                        {settingsOpen && 
+                            <div className="absolute top-13 right-0 flex flex-col gap-y-4 w-27.5 md:w-48 py-4 bg-white rounded-lg shadow-lg dark:bg-very-dark-grey">
+                                <button
+                                    onClick={ () => handleEditBoard() }                                 
+                                    className="w-full px-4 text-medium-grey text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:text-white hover:dark:bg-dark-grey"
+                                >
+                                    Edit board
+                                </button>
+
+                                <button 
+                                    className="w-full px-4 text-dark-red text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:bg-dark-grey"
+                                >
+                                    Delete task
+                                </button>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
 
             {/* Mobile version of sidebar menu */}
             {menuOpen &&
-                <div className="absolute inset-0 flex justify-center bg-black/50">
-                    <div ref={menuRef} className="absolute top-20 flex flex-col gap-y-4 w-66 py-4 bg-white border-r border-lines-light rounded-lg shadow-xl dark:bg-dark-grey dark:border-lines-dark">
+                <div 
+                    onClick={ (e) => { if (e.target === e.currentTarget) setMenuOpen(false) } }
+                    className="absolute inset-0 flex justify-center bg-black/50"
+                >
+                    <div className="absolute top-20 flex flex-col gap-y-4 w-66 py-4 bg-white border-r border-lines-light rounded-lg shadow-xl dark:bg-dark-grey dark:border-lines-dark">
                         <div className="flex flex-col">
                             {/* Heading */}
                             <h2 className="mb-4.75 pl-6 text-[0.75rem] text-medium-grey font-bold tracking-[0.15rem] uppercase">All boards ({boardsNum})</h2>
@@ -162,7 +198,7 @@ export default function Header() {
                                 {boardButtons}
                             </ul>
                         
-                            <button className="flex items-center gap-x-3 w-full text-dark-purple text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer">
+                            <button onClick={ () => handleAddBoard() } className="flex items-center gap-x-3 w-full text-dark-purple text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer">
                                 <BoardIcon/>
                                 + Create New Board
                             </button>
@@ -177,12 +213,25 @@ export default function Header() {
                     </div>
                 </div>
             }
+            
+            {/* Render BoardModal in add mode */}
+            {
+                addBoardOpen &&
+                <BoardModal addBoardOpen={addBoardOpen} setAddBoardOpen={setAddBoardOpen}/>
+            }
+
+            {/* Render BoardModal in edit mode */}
+            {
+                editBoardOpen &&
+                <BoardModal editBoardOpen={editBoardOpen} setEditBoardOpen={setEditBoardOpen}/>
+            }
 
             {/* Render TaskModal in add mode */}
             {
                 addTaskOpen && 
                 <TaskModal addTaskOpen={addTaskOpen} setAddTaskOpen={setAddTaskOpen}/>
             }
+            
         </header>
     )
 }
