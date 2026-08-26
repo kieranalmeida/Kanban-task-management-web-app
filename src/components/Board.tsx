@@ -4,6 +4,8 @@ import { useState } from "react"
 // Components
 import ViewTask from "./ViewTask"
 import TaskModal from "./TaskModal"
+import DeleteTask from "./DeleteTask"
+import AddColumn from "./AddColumn"
 
 // Context
 import { useBoards } from "./BoardsContext"
@@ -13,6 +15,8 @@ export default function Board() {
     // State variables
     const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
     const [editTaskId, setEditTaskId] = useState<string | null>(null)
+    const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null)
+    const [addColumnOpen, setAddColumnOpen] = useState(false)
 
     // Context
     const { boards } = useBoards()
@@ -62,7 +66,12 @@ export default function Board() {
                     <div className="flex justify-center items-center w-full p-6 md:p-16">
                         <div className="flex flex-col justify-center items-center gap-y-10 text-center">
                             <h2 className="text-medium-grey text-heading-l">This board is empty. Create a new column to get started.</h2>
-                            <button className="px-4.5 py-3.75 text-white bg-dark-purple rounded-2xl cursor-pointer hover:bg-light-purple">+ Add New Column</button>
+                            <button 
+                                onClick={ () => setAddColumnOpen(true) }
+                                className="px-4.5 py-3.75 text-white bg-dark-purple rounded-2xl cursor-pointer hover:bg-light-purple"
+                            >
+                                + Add New Column
+                            </button>
                         </div>
                     </div>
                 )
@@ -75,22 +84,38 @@ export default function Board() {
                             {/* Empty div for spacing */}
                             <div className="w-full h-4 pointer-events-none"/>
 
-                            <button className="w-full h-full text-medium-grey text-heading-xl bg-[#E9EFFA] rounded-lg cursor-pointer hover:text-dark-purple dark:bg-dark-grey">+ New Column</button>
+                            <button 
+                                onClick={ () => setAddColumnOpen(true) }
+                                className="w-full h-full text-medium-grey text-heading-xl bg-[#E9EFFA] rounded-lg cursor-pointer hover:text-dark-purple dark:bg-dark-grey"
+                            >
+                                + New Column
+                            </button>
                         </div>
                     </div>
                 )
             }
 
+            {
+                addColumnOpen &&
+                <AddColumn onClose={ () => setAddColumnOpen(false) }/>
+            }
+
             {/* If a task is active (clicked on) render ViewTask */}
             {
                 activeTaskId && 
-                <ViewTask activeTaskId={activeTaskId} setActiveTaskId={setActiveTaskId} setEditTaskId={setEditTaskId}/>
+                <ViewTask activeTaskId={activeTaskId} setActiveTaskId={setActiveTaskId} setEditTaskId={setEditTaskId} setDeleteTaskId={setDeleteTaskId}/>
             }
 
             {/* Render TaskModal in edit mode */}
             {
                 editTaskId &&
                 <TaskModal editTaskId={editTaskId} setEditTaskId={setEditTaskId}/>
+            }
+
+            {/* Render DeleteModal for the active task */}
+            {
+                deleteTaskId &&
+                <DeleteTask deleteTaskId={deleteTaskId} onClose={ () => setDeleteTaskId(null)}/>
             }
         </main>
     )

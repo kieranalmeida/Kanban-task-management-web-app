@@ -12,10 +12,11 @@ import chevronDown from "../images/icon-chevron-down.svg"
 type ViewTaskProps = {
     activeTaskId: string,
     setActiveTaskId: React.Dispatch<React.SetStateAction<string | null>>,
-    setEditTaskId: React.Dispatch<React.SetStateAction<string | null>>
+    setEditTaskId: React.Dispatch<React.SetStateAction<string | null>>,
+    setDeleteTaskId: React.Dispatch<React.SetStateAction<string | null>>
 }
 
-export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId}: ViewTaskProps) {
+export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, setDeleteTaskId}: ViewTaskProps) {
     // State variables
     const [settingsOpen, setSettingsOpen] = useState(false) // Controls task settings box
     const [selectOpen, setSelectOpen] = useState(false) // Controls select box
@@ -169,6 +170,11 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId}:
         setEditTaskId(activeTaskId)
     }
 
+    function handleDeleteTask() {
+        setActiveTaskId(null)
+        setDeleteTaskId(activeTaskId)
+    }
+
     return (
         <div 
             onClick={ (e) => { if (e.target === e.currentTarget) setActiveTaskId(null) } }
@@ -196,7 +202,8 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId}:
                                     Edit task
                                 </button>
 
-                                <button 
+                                <button
+                                    onClick={ () => handleDeleteTask() }
                                     className="w-full px-4 text-dark-red text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:bg-dark-grey"
                                 >
                                     Delete task

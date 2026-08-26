@@ -6,6 +6,7 @@ import { Link } from "react-router-dom"
 import ThemeSwitch from "./ThemeSwitch"
 import TaskModal from "./TaskModal"
 import BoardModal from "./BoardModal"
+import DeleteModal from "./DeleteBoard"
 
 // Context
 import { useTheme } from "./ThemeContext"
@@ -30,6 +31,7 @@ export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false) // Controls header mobile menu
     const [settingsOpen, setSettingsOpen] = useState(false) // Controls task settings box
     const [addTaskOpen, setAddTaskOpen] = useState(false) // Controls add task menu
+    const [deleteBoardOpen, setDeleteBoardOpen] = useState(false)
 
     // Refs
     const settingsRef = useRef<HTMLDivElement | null>(null)
@@ -90,6 +92,11 @@ export default function Header() {
     function handleEditBoard() {
         setSettingsOpen(false)
         setEditBoardOpen(true)
+    }
+
+    function handleDeleteBoard() {
+        setSettingsOpen(false)
+        setDeleteBoardOpen(true)
     }
     
     // Board button normal + active styling
@@ -172,9 +179,10 @@ export default function Header() {
                                 </button>
 
                                 <button 
+                                    onClick={ () => handleDeleteBoard() }
                                     className="w-full px-4 text-dark-red text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:bg-dark-grey"
                                 >
-                                    Delete task
+                                    Delete board
                                 </button>
                             </div>
                         }
@@ -224,6 +232,12 @@ export default function Header() {
             {
                 editBoardOpen &&
                 <BoardModal editBoardOpen={editBoardOpen} setEditBoardOpen={setEditBoardOpen}/>
+            }
+
+            {/* Render DeleteModal for the current board*/}
+            {
+                deleteBoardOpen &&
+                <DeleteModal onClose={ () => setDeleteBoardOpen(false) }/>
             }
 
             {/* Render TaskModal in add mode */}
