@@ -1,3 +1,4 @@
+// Context
 import { useTheme } from "./ThemeContext"
 
 // Switch to toggle dark mode on and off
@@ -8,8 +9,9 @@ export default function ThemeSwitch() {
         <button 
             onClick={ () => setDarkMode(!darkMode) } 
             className={`
-            flex items-center w-10 h-5 p-1 bg-dark-purple rounded-full cursor-pointer transition hover:bg-light-purple
-            `}>
+                flex items-center w-10 h-5 p-1 bg-dark-purple rounded-full cursor-pointer transition hover:bg-light-purple
+            `}
+        >
 
             <div 
                 className={`

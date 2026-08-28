@@ -158,7 +158,7 @@ export default function BoardForm({initialValues, formHeading, formButtonText, o
 
                             {
                                 (formErrors.name && !name) &&
-                                <span className="absolute top-2.5 right-2 text-dark-red text-body-l">Can't be empty</span>
+                                <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors.name}</span>
                             }
                         </div>
                     </div>
@@ -171,7 +171,10 @@ export default function BoardForm({initialValues, formHeading, formButtonText, o
                             {
                                 columns.map( (column) => {
                                     return (
-                                        <li className="flex gap-x-4" key={column.id}>
+                                        <li 
+                                            className="flex gap-x-4" 
+                                            key={column.id}
+                                        >
                                             <div className="relative w-full">
                                                 <input
                                                     type="text"
@@ -188,7 +191,7 @@ export default function BoardForm({initialValues, formHeading, formButtonText, o
 
                                                 {
                                                     (formErrors[`column-${column.id}`] && !column.name) && 
-                                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">Can't be empty</span>
+                                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">formErrors[`column-${column.id}`]</span>
                                                 }
                                             </div>
 

@@ -75,6 +75,7 @@ export default function AddColumn({onClose}: AddColumnProps) {
             })
         )
 
+        // Close the add column menu
         onClose()
     }
 

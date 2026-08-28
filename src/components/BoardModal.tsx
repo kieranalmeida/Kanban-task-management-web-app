@@ -27,7 +27,7 @@ type BoardModalProps = AddBoardModalProps | EditBoardModalProps
 export default function BoardModal({addBoardOpen, setAddBoardOpen, editBoardOpen, setEditBoardOpen}: BoardModalProps) {
     // Context
     const { boards, setBoards } = useBoards()
-    const { activeBoardId } = useActiveBoardId()
+    const { activeBoardId, setActiveBoardId } = useActiveBoardId()
 
     // Derived values
     const activeBoard = boards.find( (board) => board.id === activeBoardId)
@@ -49,9 +49,11 @@ export default function BoardModal({addBoardOpen, setAddBoardOpen, editBoardOpen
         ]
     }
 
+    // Get initial form values when BoardForm is in edit mode
     function getEditBoardFormValues() {
         if (!activeBoard) return
 
+        // The values of the board being edited are used to set the initial values
         const editBoardFormValues = {
             name: activeBoard.name,
             columns: activeBoard.columns
@@ -71,6 +73,9 @@ export default function BoardModal({addBoardOpen, setAddBoardOpen, editBoardOpen
 
         // Add the new board to the array of boards in state
         setBoards( (prevBoards) => [...prevBoards, newBoard])
+
+        // Set the active board to the newly created board
+        setActiveBoardId(newBoard.id)
 
         // Close the add board form
         setAddBoardOpen!(false)

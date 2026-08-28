@@ -3,7 +3,6 @@ import { useState, useEffect } from "react"
 
 // Components
 import ThemeSwitch from "./ThemeSwitch"
-import BoardModal from "./BoardModal"
 
 // Context
 import { useSidebar } from "./SidebarContext"
@@ -26,23 +25,26 @@ export default function Sidebar() {
     const { sidebarOpen, setSidebarOpen } = useSidebar()
     const { boards } = useBoards()
     const { activeBoardId, setActiveBoardId } = useActiveBoardId()
-    const { addBoardOpen, setAddBoardOpen } = useBoardModalContext()
+    const { setAddBoardOpen } = useBoardModalContext() // Controls BoardModal in add mode
 
     // Derived values
-    const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
-    const boardsNum = boards.length // Get the amount of boards
-    
-    // Board button normal + active styling
-    const boardButtonClass = (name: string) => `
-        flex items-center gap-x-3 w-full text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer 
-        ${activeBoard?.name === name ? "text-white bg-dark-purple" : "text-medium-grey hover:text-dark-purple hover:bg-dark-purple/10 dark:hover:bg-white"}  
-    `
+    const activeBoard = boards.find( (board) => board.id === activeBoardId)
+    const boardsNum = boards.length
 
     // Creates a button for each board
     const boardButtons = boards.map( (board) => {
         return (
-            <li className="flex items-center w-full rounded-r-full" key={board.name}>
-                <button onClick={ () => setActiveBoardId(board.id) } className={boardButtonClass(board.name)}>
+            <li 
+                className="flex items-center w-full rounded-r-full" 
+                key={board.id}
+            >
+                <button 
+                    onClick={ () => setActiveBoardId(board.id) } 
+                    className={`
+                        flex items-center gap-x-3 w-full text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer 
+                        ${activeBoard?.id === board.id ? "text-white bg-dark-purple" : "text-medium-grey hover:text-dark-purple hover:bg-dark-purple/10 dark:hover:bg-white"}    
+                    `}
+                >
                     <BoardIcon/>
                     {board.name}
                 </button>
@@ -81,7 +83,14 @@ export default function Sidebar() {
                                 {boardButtons}
                             </ul>
 
-                            <button onClick={ () => setAddBoardOpen(true) }className="flex items-center gap-x-3 w-full text-dark-purple text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer">
+                            <button 
+                                onClick={ () => setAddBoardOpen(true) } 
+                                className={`
+                                    flex items-center gap-x-3 w-full text-dark-purple text-heading-m
+                                    ${boards.length === 0 ? "-mt-3.5" : ""}
+                                    pl-6 py-3.5 rounded-r-full cursor-pointer
+                                `}
+                            >
                                 <BoardIcon/>
                                 + Create New Board
                             </button>
@@ -90,12 +99,23 @@ export default function Sidebar() {
                         {/* Controls */}
                         <div className="flex flex-col gap-y-2 mb-8">
                             <div className="flex justify-center items-center gap-x-5.5 w-58.75 2xl:w-62.75 mx-auto py-3.5 bg-light-grey rounded-lg dark:bg-very-dark-grey">
-                                <img src={lightThemeIcon}/>
+                                <img 
+                                    src={lightThemeIcon}
+                                    alt=""
+                                />
+
                                 <ThemeSwitch/>
-                                <img src={darkThemeIcon}/>
+
+                                <img 
+                                    src={darkThemeIcon}
+                                    alt=""
+                                />
                             </div>
             
-                            <button onClick={ () => setSidebarOpen(!sidebarOpen) } className="flex items-center gap-x-3.75 w-60 2xl:w-69 pl-6 py-3.5 text-medium-grey text-heading-m cursor-pointer hover:text-dark-purple hover:bg-dark-purple/10 rounded-r-full dark:hover:bg-white">
+                            <button 
+                                onClick={ () => setSidebarOpen(!sidebarOpen) } 
+                                className="flex items-center gap-x-3.75 w-60 2xl:w-69 pl-6 py-3.5 text-medium-grey text-heading-m cursor-pointer hover:text-dark-purple hover:bg-dark-purple/10 rounded-r-full dark:hover:bg-white"
+                            >
                                 <HideSidebarIcon className="mt-1"/>
                                 Hide Sidebar
                             </button>
@@ -104,16 +124,13 @@ export default function Sidebar() {
                 )
                 : (
                     // Show sidebar button
-                    <button onClick={() => setSidebarOpen(true)} className="absolute left-0 bottom-8 flex justify-center items-center w-14 h-12 text-white bg-dark-purple rounded-r-full cursor-pointer hover:bg-light-purple">
+                    <button 
+                        onClick={ () => setSidebarOpen(true) } 
+                        className="absolute left-0 bottom-8 flex justify-center items-center w-14 h-12 text-white bg-dark-purple rounded-r-full cursor-pointer hover:bg-light-purple"
+                    >
                         <ShowSidebarIcon />
                     </button>
                 )
-            }
-
-            {/* Render BoardModal in add mode */}
-            {
-                addBoardOpen &&
-                <BoardModal addBoardOpen={addBoardOpen} setAddBoardOpen={setAddBoardOpen}/>
             }
         </>
     )

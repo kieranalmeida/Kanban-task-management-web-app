@@ -26,15 +26,16 @@ type TaskModalProps = AddTaskModalProps | EditTaskModalProps
 
 export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setEditTaskId}: TaskModalProps) {
     // Context
-    const { boards, setBoards } = useBoards() // Controls boards
-    const { activeBoardId } = useActiveBoardId() // Controls active board ID
+    const { boards, setBoards } = useBoards()
+    const { activeBoardId } = useActiveBoardId()
     
     // Derived values
-    const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
+    const activeBoard = boards.find( (board) => board.id === activeBoardId)
     const defaultColumnId = activeBoard?.columns[0].id // Get the the id of the first column in the active board to set the default column in the add task select box
     const activeTask = activeBoard?.columns.flatMap( (column) => column.tasks).find( (task) => task.id === editTaskId) // Get the task being edited
     const activeColumn = activeBoard?.columns?.find( (column) => column.tasks.some( (task) => task.id === editTaskId) ) // Get active column (the one the task being edited is in before being updated)
 
+    // Return early if defaultColumnId doesn't exist to satisfy TypeScript
     if (!defaultColumnId) return
 
     // Empty task form for when TaskForm is rendered in add mode (used to set initial state values)
@@ -60,6 +61,7 @@ export default function TaskModal({addTaskOpen, setAddTaskOpen, editTaskId, setE
     function getEditTaskFormValues() {
         if (!activeTask || !activeColumn) return
         
+        // The values of the task being edited are used to set the initial values of the form
         const editTaskFormValues = {
             title: activeTask.title,
             description: activeTask.description,

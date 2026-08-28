@@ -21,8 +21,10 @@ export default function DeleteBoard({onClose}: DeleteBoardProps) {
         // Delete board
         setBoards(newBoards)
         
-        // Change active board id to the next one in the list
-        setActiveBoardId(newBoards[0].id)
+        // Change active board id to the next one in the list, assuming there's at least one board
+        if (newBoards.length >= 1) {
+            setActiveBoardId(newBoards[0].id)
+        }
 
         // Close the modal
         onClose()

@@ -26,18 +26,18 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
     const selectBoxRef = useRef<HTMLDivElement | null>(null) 
 
     // Context
-    const { boards, setBoards } = useBoards() // Controls boards
-    const { activeBoardId } = useActiveBoardId() // Controls active board ID
+    const { boards, setBoards } = useBoards()
+    const { activeBoardId } = useActiveBoardId()
 
     // Derived values
-    const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
-    const activeTask = activeBoard?.columns.flatMap( (column) => column.tasks).find( (task) => task.id === activeTaskId) // Get active task
-    const activeColumn = activeBoard?.columns?.find( (column) => column.tasks.some( (task) => task.id === activeTaskId) ) // Get active column
+    const activeBoard = boards.find( (board) => board.id === activeBoardId)
+    const activeTask = activeBoard?.columns.flatMap( (column) => column.tasks).find( (task) => task.id === activeTaskId)
+    const activeColumn = activeBoard?.columns?.find( (column) => column.tasks.some( (task) => task.id === activeTaskId) )
     
     // If activeTask or activeColumn don't exist, return so that TypeScript doesn't complain
     if (!activeTask || !activeColumn) return
 
-    const completedTasks = activeTask?.subtasks.filter( (subtask) => subtask.isCompleted === true) // Get the amount of completed subtasks for the current task
+    const completedTasks = activeTask?.subtasks.filter( (subtask) => subtask.isCompleted === true)
     
     // Handle outside clicks
     useEffect( () => {
@@ -165,123 +165,155 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
     }
 
     // Handle opening TaskForm in edit mode
-    function handleEditTask() {
+    function handleOpenEditTask() {
         setActiveTaskId(null)
         setEditTaskId(activeTaskId)
     }
 
-    function handleDeleteTask() {
+    function handleOpenDeleteTask() {
         setActiveTaskId(null)
         setDeleteTaskId(activeTaskId)
     }
 
     return (
-        <div 
-            onClick={ (e) => { if (e.target === e.currentTarget) setActiveTaskId(null) } }
-            className="absolute inset-0 flex justify-center items-center p-4 bg-black/50"
-        >
-            <div className="z-10 flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-dark-grey">
-                {/* Heading and settings button */}
-                <div className="flex justify-between items-center gap-x-6">
-                    <h2 className="text-black text-heading-l dark:text-white">{activeTask.title}</h2>
+            <div 
+                onClick={ (e) => { if (e.target === e.currentTarget) setActiveTaskId(null) } }
+                className="absolute inset-0 flex justify-center items-center p-4 bg-black/50"
+            >
+                <div className="z-10 flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-dark-grey">
+                    {/* Heading and settings button */}
+                    <div className="flex justify-between items-center gap-x-6">
+                        <h2 className="text-black text-heading-l dark:text-white">{activeTask.title}</h2>
 
-                    <div ref={settingsRef} className="relative flex justify-center">
-                        <button 
-                            onClick={ () => setSettingsOpen(!settingsOpen) } 
-                            className="shrink-0 px-3 py-1.5 md:px-4 md:py-2 cursor-pointer hover:bg-lines-light hover:rounded-full dark:hover:bg-lines-dark"
+                        {/* Settings button and menu */}
+                        <div 
+                            ref={settingsRef} 
+                            className="relative flex justify-center"
                         >
-                            <img className="w-[3.7px] md:w-[4.6px]" src={verticalEllipsis} alt="View task settings"/>
-                        </button>
+                            <button 
+                                onClick={ () => setSettingsOpen(!settingsOpen) } 
+                                className="shrink-0 px-3 py-1.5 md:px-4 md:py-2 cursor-pointer hover:bg-lines-light hover:rounded-full dark:hover:bg-lines-dark"
+                            >
+                                <img 
+                                    className="w-[3.7px] md:w-[4.6px]" 
+                                    src={verticalEllipsis} 
+                                    alt="View task settings"
+                                />
+                            </button>
 
-                        {settingsOpen && 
-                            <div className="absolute top-12 right-0 md:right-auto flex flex-col gap-y-4 w-27.5 md:w-48 py-4 bg-white rounded-lg shadow-lg dark:bg-very-dark-grey">
-                                <button
-                                    onClick={ () => handleEditTask() }                                 
-                                    className="w-full px-4 text-medium-grey text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:text-white hover:dark:bg-dark-grey"
-                                >
-                                    Edit task
-                                </button>
+                            {settingsOpen && 
+                                <div className="absolute top-12 right-0 md:right-auto flex flex-col gap-y-4 w-27.5 md:w-48 py-4 bg-white rounded-lg shadow-lg dark:bg-very-dark-grey">
+                                    <button
+                                        onClick={ () => handleOpenEditTask() }                                 
+                                        className="w-full px-4 text-medium-grey text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:text-white hover:dark:bg-dark-grey"
+                                    >
+                                        Edit task
+                                    </button>
 
-                                <button
-                                    onClick={ () => handleDeleteTask() }
-                                    className="w-full px-4 text-dark-red text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:bg-dark-grey"
-                                >
-                                    Delete task
-                                </button>
-                            </div>
-                        }
+                                    <button
+                                        onClick={ () => handleOpenDeleteTask() }
+                                        className="w-full px-4 text-dark-red text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:bg-dark-grey"
+                                    >
+                                        Delete task
+                                    </button>
+                                </div>
+                            }
+                        </div>
                     </div>
-                </div>
 
-                {/* Description */}
-                <p className="text-medium-grey text-body-l">{activeTask.description}</p>
+                    {/* Description */}
+                    <p className="text-medium-grey text-body-l">{activeTask.description}</p>
 
-                {/* Subtasks */}
-                <div className="flex flex-col gap-y-4">
-                    <h2 className="text-medium-grey text-body-m dark:text-white">Subtasks ({completedTasks.length} of {activeTask.subtasks.length})</h2>
+                    {/* Subtasks */}
+                    <div className="flex flex-col gap-y-4">
+                        <h2 className="text-medium-grey text-body-m dark:text-white">Subtasks ({completedTasks.length} of {activeTask.subtasks.length})</h2>
 
-                    <ul className="flex flex-col gap-y-2">
-                        {
-                            activeTask.subtasks.length === 0 ? 
-                            <p className="-mt-2 text-medium-grey text-body-l">This task has no subtasks.</p> 
-                            :
-                            activeTask.subtasks.map( (subtask) => {
-                                return (
-                                    <li 
-                                        className="bg-light-grey rounded-lg hover:bg-dark-purple/25 dark:bg-very-dark-grey dark:hover:bg-dark-purple/25" key={subtask.title}>
-                                        <label 
-                                            className="flex items-center gap-x-4 p-4 cursor-pointer"
+                        <ul className="flex flex-col gap-y-2">
+                            {
+                                activeTask.subtasks.length === 0 ? 
+                                <p className="-mt-2 text-medium-grey text-body-l">This task has no subtasks.</p> 
+                                :
+                                activeTask.subtasks.map( (subtask) => {
+                                    return (
+                                        <li 
+                                            className="bg-light-grey rounded-lg hover:bg-dark-purple/25 dark:bg-very-dark-grey dark:hover:bg-dark-purple/25" 
+                                            key={subtask.title}
                                         >
-                                            <input
-                                                type="checkbox"
-                                                checked={subtask.isCompleted}
-                                                onChange={ () => handleCheckboxChange(subtask.id) }
-                                                className="accent-dark-purple w-4 h-4 shrink-0 dark:accent-black"
-                                            />
+                                            <label 
+                                                className="flex items-center gap-x-4 p-4 cursor-pointer"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={subtask.isCompleted}
+                                                    onChange={ () => handleCheckboxChange(subtask.id) }
+                                                    className="accent-dark-purple w-4 h-4 shrink-0 dark:accent-black"
+                                                />
 
-                                            <span className={`${subtask.isCompleted ? "text-medium-grey line-through" : "text-black dark:text-white"} text-body-m`}>{subtask.title}</span>
-                                        </label>
-                                    </li>
-                                )
-                            })
-                        }
-                    </ul>
-                </div>
-
-                {/* Status */}
-                <div className="flex flex-col gap-y-2">
-                    <h2 className="text-medium-grey text-body-m">Current Status</h2>
-
-                    <div ref={selectBoxRef} className="relative">
-                        <button
-                            onClick={ () => setSelectOpen(!selectOpen) }
-                            className={`relative flex justify-between items-center w-full px-4 py-2 border ${selectOpen ? "border-dark-purple" : "border-medium-grey/25"} rounded-lg cursor-pointer hover:border-dark-purple`}
-                        >
-                            <span className="text-black text-body-l dark:text-white">{activeColumn?.name}</span>
-                            <img className="mt-1" src={chevronDown} alt=""/>
-                        </button>
-
-                        {selectOpen &&
-                            <ul className="absolute mt-2.5 flex flex-col gap-y-2 w-full py-4 bg-white rounded-lg shadow-lg dark:bg-very-dark-grey">
-                                {
-                                    activeBoard?.columns?.map( (column) => {
-                                        return (
-                                            <li className="group hover:bg-light-grey hover:dark:bg-dark-grey" key={column.id}>
-                                                <button 
-                                                    onClick={ () => handleStatusChange(column.id) }
-                                                    className="w-full px-4 text-medium-grey text-body-l text-left rounded-lg cursor-pointer group-hover:text-black group-hover:dark:text-white"
+                                                <span 
+                                                    className={`
+                                                        ${subtask.isCompleted ? "text-medium-grey line-through" : "text-black dark:text-white"}
+                                                        text-body-m
+                                                    `}
                                                 >
-                                                    {column.name}
-                                                </button>
-                                            </li>
-                                        )
-                                    })
-                                }
-                            </ul>
-                        }
+                                                    {subtask.title}
+                                                </span>
+                                            </label>
+                                        </li>
+                                    )
+                                })
+                            }
+                        </ul>
+                    </div>
+
+                    {/* Status */}
+                    <div className="flex flex-col gap-y-2">
+                        <h2 className="text-medium-grey text-body-m">Current Status</h2>
+
+                        <div 
+                            ref={selectBoxRef} 
+                            className="relative"
+                        >
+                            <button
+                                onClick={ () => setSelectOpen(!selectOpen) }
+                                className={`
+                                    relative flex justify-between items-center w-full px-4 py-2 border 
+                                    ${selectOpen ? "border-dark-purple" : "border-medium-grey/25"}
+                                    rounded-lg cursor-pointer hover:border-dark-purple
+                                `}
+                            >
+                                <span className="text-black text-body-l dark:text-white">{activeColumn?.name}</span>
+
+                                <img 
+                                    className="mt-1" 
+                                    src={chevronDown} 
+                                    alt=""
+                                />
+                            </button>
+
+                            {selectOpen &&
+                                <ul className="absolute mt-2.5 flex flex-col gap-y-2 w-full py-4 bg-white rounded-lg shadow-lg dark:bg-very-dark-grey">
+                                    {
+                                        activeBoard?.columns?.map( (column) => {
+                                            return (
+                                                <li 
+                                                    className="group hover:bg-light-grey hover:dark:bg-dark-grey" 
+                                                    key={column.id}
+                                                >
+                                                    <button 
+                                                        onClick={ () => handleStatusChange(column.id) }
+                                                        className="w-full px-4 text-medium-grey text-body-l text-left rounded-lg cursor-pointer group-hover:text-black group-hover:dark:text-white"
+                                                    >
+                                                        {column.name}
+                                                    </button>
+                                                </li>
+                                            )
+                                        })
+                                    }
+                                </ul>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     )
 }

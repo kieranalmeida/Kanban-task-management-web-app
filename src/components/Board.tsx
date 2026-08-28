@@ -4,28 +4,32 @@ import { useState } from "react"
 // Components
 import ViewTask from "./ViewTask"
 import TaskModal from "./TaskModal"
-import DeleteTask from "./DeleteTask"
 import AddColumn from "./AddColumn"
+import DeleteTask from "./DeleteTask"
 
 // Context
 import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
+import { useBoardModalContext } from "./BoardModalContext"
+import BoardModal from "./BoardModal"
 
 export default function Board() {
     // State variables
-    const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
-    const [editTaskId, setEditTaskId] = useState<string | null>(null)
-    const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null)
-    const [addColumnOpen, setAddColumnOpen] = useState(false)
+    const [activeTaskId, setActiveTaskId] = useState<string | null>(null) // Controls ViewTask
+    const [editTaskId, setEditTaskId] = useState<string | null>(null) // Controls TaskModal in edit mode
+    const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null) // Controls DeleteTask
+    const [addColumnOpen, setAddColumnOpen] = useState(false) // Controls AddColumn
 
     // Context
     const { boards } = useBoards()
     const { activeBoardId } = useActiveBoardId()
+    const { addBoardOpen, setAddBoardOpen } = useBoardModalContext()
 
     // Derived values
     const activeBoard = boards.find( (board) => board.id === activeBoardId)
     
     const boardHtml = activeBoard?.columns?.map( (column, index) => {
+        // Used to assign colors to each column
         const colors = ["bg-sky-400", "bg-fuchsia-500", "bg-green-500", "bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-teal-400", "bg-cyan-400", "bg-blue-500", "bg-indigo-500", "bg-rose-500"]
         
         return (
@@ -45,7 +49,10 @@ export default function Board() {
                             
                             return (
                                 <li className="min-h-22 bg-white rounded-lg shadow-md group dark:bg-dark-grey" key={task.id}>
-                                    <button onClick={() => setActiveTaskId(task.id)} className="flex flex-col gap-y-2 w-full px-4 py-5.5 text-left cursor-pointer">
+                                    <button 
+                                    onClick={() => setActiveTaskId(task.id)} 
+                                    className="flex flex-col gap-y-2 w-full px-4 py-5.5 text-left cursor-pointer"
+                                    >
                                         <h3 className="text-black text-heading-m group-hover:text-dark-purple dark:text-white">{task.title}</h3>
                                         <p className="text-medium-grey text-body-m">{completedTasks.length} of {task.subtasks.length} subtasks</p>
                                     </button>
@@ -61,11 +68,27 @@ export default function Board() {
     return (
         <main className="flex w-full h-full bg-light-grey overflow-auto dark:bg-very-dark-grey">
             {
-                activeBoard?.columns?.length === 0 ? (
+                // There are no boards
+                !activeBoard ? (
+                        <div className="flex justify-center items-center w-full p-6 md:p-16">
+                            <div className="flex flex-col justify-center items-center gap-y-10 text-center">
+                                <h2 className="text-medium-grey text-heading-l">There are no boards available. Create a new board to get started.</h2>
+
+                                <button 
+                                    onClick={ () => setAddBoardOpen(true) }
+                                    className="px-4.5 py-3.75 text-white bg-dark-purple rounded-2xl cursor-pointer hover:bg-light-purple"
+                                >
+                                    + Add New Board
+                                </button>
+                            </div>
+                        </div>
+                )
+                : (activeBoard && activeBoard?.columns?.length === 0) ? (
                     // Active board has no columns
                     <div className="flex justify-center items-center w-full p-6 md:p-16">
                         <div className="flex flex-col justify-center items-center gap-y-10 text-center">
                             <h2 className="text-medium-grey text-heading-l">This board is empty. Create a new column to get started.</h2>
+
                             <button 
                                 onClick={ () => setAddColumnOpen(true) }
                                 className="px-4.5 py-3.75 text-white bg-dark-purple rounded-2xl cursor-pointer hover:bg-light-purple"
@@ -95,6 +118,13 @@ export default function Board() {
                 )
             }
 
+            {/* Render BoardModal in add mode */}
+            {
+                addBoardOpen &&
+                <BoardModal addBoardOpen={addBoardOpen} setAddBoardOpen={setAddBoardOpen}/>
+            }
+
+            {/* Render AddColumn */}
             {
                 addColumnOpen &&
                 <AddColumn onClose={ () => setAddColumnOpen(false) }/>

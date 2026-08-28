@@ -32,19 +32,19 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
     const [description, setDescription] = useState(initialValues.description)
     const [subtasks, setSubtasks] = useState<SubTask[]>(initialValues.subtasks)
     const [targetColumnId, setTargetColumnId] = useState(initialValues.targetColumnId) // Controls the id of the target column (the one chosen in the form select box)
-    const [selectOpen, setSelectOpen] = useState(false) // Controls select box
+    const [selectOpen, setSelectOpen] = useState(false)
     const [formErrors, setFormErrors] = useState<TaskFormErrors>({}) // Controls form errors to render custom error messages
 
     // Refs
     const selectBoxRef = useRef<HTMLDivElement | null>(null)
     
     // Context
-    const { boards } = useBoards() // Controls boards
-    const { activeBoardId } = useActiveBoardId() // Controls active board ID
+    const { boards } = useBoards()
+    const { activeBoardId } = useActiveBoardId()
     
     // Derived values
-    const activeBoard = boards.find( (board) => board.id === activeBoardId) // Get active board
-    const targetColumn = activeBoard?.columns.find( (column) => column.id === targetColumnId) // Get target column
+    const activeBoard = boards.find( (board) => board.id === activeBoardId)
+    const targetColumn = activeBoard?.columns.find( (column) => column.id === targetColumnId)
 
     // Handle outside clicks
     useEffect( () => {
@@ -222,7 +222,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
 
                             {
                                 (formErrors.title && !title) &&
-                                <span className="absolute top-2.5 right-2 text-dark-red text-body-l">Can't be empty</span>
+                                <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors.title}</span>
                             }
                         </div>
                     </div>
@@ -253,7 +253,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
 
                             {
                                 (formErrors.description && !description) &&
-                                <span className="absolute bottom-2.5 right-2 text-dark-red text-body-l">Can't be empty</span>
+                                <span className="absolute bottom-2.5 right-2 text-dark-red text-body-l">{formErrors.description}</span>
                             }
                         </div>
                     </div>
@@ -262,11 +262,18 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
                     <div className="flex flex-col">
                         <h3 className="text-medium-grey text-[0.75rem] font-bold dark:text-white">Subtasks</h3>
 
-                        <ul className={`flex flex-col gap-y-3 mt-2 ${subtasks.length > 0 ? "mb-3" : "mb-0"}`}>
+                        <ul className={`
+                                flex flex-col gap-y-3 mt-2 
+                                ${subtasks.length > 0 ? "mb-3" : "mb-0"}
+                            `}
+                        >
                             {
                                 subtasks.map( (subtask) => {
                                     return (
-                                        <li className="flex gap-x-4" key={subtask.id}>
+                                        <li 
+                                            className="flex gap-x-4" 
+                                            key={subtask.id}
+                                        >
                                             <div className="relative w-full">
                                                 <input
                                                     type="text"
@@ -284,7 +291,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
 
                                                 {
                                                     (formErrors[`subtask-${subtask.id}`] && !subtask.title) && 
-                                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">Can't be empty</span>
+                                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors[`subtask-${subtask.id}`]}</span>
                                                 }
                                             </div>
 
@@ -314,15 +321,26 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
                     <div className="flex flex-col gap-y-2">
                         <h2 className="text-medium-grey text-body-m dark:text-white">Current Status</h2>
 
-                        <div ref={selectBoxRef} className="relative">
+                        <div 
+                            ref={selectBoxRef} 
+                            className="relative"
+                        >
                             <button
-
                                 type="button"
                                 onClick={ () => setSelectOpen(!selectOpen) }
-                                className={`relative flex justify-between items-center w-full px-4 py-2 border ${selectOpen ? "border-dark-purple" : "border-medium-grey/25"} rounded-lg cursor-pointer hover:border-dark-purple`}
+                                className={`
+                                    relative flex justify-between items-center w-full px-4 py-2 border 
+                                    ${selectOpen ? "border-dark-purple" : "border-medium-grey/25"}
+                                    rounded-lg cursor-pointer hover:border-dark-purple
+                                `}
                             >
                                 <span className="text-black text-body-l dark:text-white">{targetColumn?.name}</span>
-                                <img className="mt-1" src={chevronDown} alt=""/>
+
+                                <img 
+                                    className="mt-1" 
+                                    src={chevronDown} 
+                                    alt=""
+                                />
                             </button>
 
                             {selectOpen &&
@@ -330,7 +348,10 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
                                     {
                                         activeBoard?.columns?.map( (column) => {
                                             return (
-                                                <li className="group hover:bg-light-grey hover:dark:bg-dark-grey" key={column.id}>
+                                                <li 
+                                                    className="group hover:bg-light-grey hover:dark:bg-dark-grey" 
+                                                    key={column.id}
+                                                >
                                                     <button 
                                                         type="button"
                                                         onClick={ () => handleSelectBox(column.id) }

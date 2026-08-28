@@ -28,7 +28,9 @@ export default function Layout() {
     // Controls the sidebar
     const [sidebarOpen, setSidebarOpen] = useState(true)
     
-    // Controls the boards. Intialized as the data from data.json, but with an ID inserted into every board, column and task. "useState( () => )" is used to ensure IDs are only generated when state is initialized, not every time Layout renders. The original json data is not modified by any user input on the website, only the copy of it stored in state. In a real application, data like this would naturally be stored in a database.
+    // Controls the boards. Intialized as the data from data.json, but with an ID inserted into every board, column and task for accurate identification whenever it is needed.
+    // "useState( () => )" is used to ensure IDs are only generated when state is initialized, not every time Layout renders.
+    // The original json data is not modified by any user input on the website, only the copy of it stored in state. In a real application, data like this would naturally be managed in a database.
     const [boards, setBoards] = useState<Boards>( () => 
         data.boards.map( (board) => ({
             ...board,
@@ -48,12 +50,12 @@ export default function Layout() {
         }))
     )
     
-    // Controls the active board
+    // Controls the active board. Initialised as the first board available
     const [activeBoardId, setActiveBoardId] = useState<string>( () => boards[0].id)
 
-    // Controls add board form
+    // Controls BoardModal in add mode
     const [addBoardOpen, setAddBoardOpen] = useState(false)
-    // Controls edit board form
+    // Controls BoardModal in edit mode
     const [editBoardOpen, setEditBoardOpen] = useState(false)
 
     // When darkMode changes, update the value saved in local storage. toString() is used to satisfy TypeScript
