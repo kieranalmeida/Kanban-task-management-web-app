@@ -191,8 +191,12 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
                             className="relative flex justify-center"
                         >
                             <button 
-                                onClick={ () => setSettingsOpen(!settingsOpen) } 
+                                onClick={ () => setSettingsOpen(!settingsOpen) }
+                                type="button"
                                 className="shrink-0 px-3 py-1.5 md:px-4 md:py-2 cursor-pointer hover:bg-lines-light hover:rounded-full dark:hover:bg-lines-dark"
+                                aria-expanded={settingsOpen}
+                                aria-haspopup={true}
+                                aria-label="View task settings"
                             >
                                 <img 
                                     className="w-[3.7px] md:w-[4.6px]" 
@@ -204,7 +208,8 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
                             {settingsOpen && 
                                 <div className="absolute top-12 right-0 md:right-auto flex flex-col gap-y-4 w-27.5 md:w-48 py-4 bg-white rounded-lg shadow-lg dark:bg-very-dark-grey">
                                     <button
-                                        onClick={ () => handleOpenEditTask() }                                 
+                                        onClick={ () => handleOpenEditTask() }
+                                        type="button"                                 
                                         className="w-full px-4 text-medium-grey text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:text-white hover:dark:bg-dark-grey"
                                     >
                                         Edit task
@@ -212,6 +217,7 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
 
                                     <button
                                         onClick={ () => handleOpenDeleteTask() }
+                                        type="button"
                                         className="w-full px-4 text-dark-red text-body-l text-left cursor-pointer hover:bg-light-grey hover:dark:bg-dark-grey"
                                     >
                                         Delete task
@@ -247,6 +253,7 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
                                                     checked={subtask.isCompleted}
                                                     onChange={ () => handleCheckboxChange(subtask.id) }
                                                     className="accent-dark-purple w-4 h-4 shrink-0 dark:accent-black"
+                                                    aria-label="Toggle subtask status"
                                                 />
 
                                                 <span 
@@ -279,7 +286,10 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
                                     relative flex justify-between items-center w-full px-4 py-2 border 
                                     ${selectOpen ? "border-dark-purple" : "border-medium-grey/25"}
                                     rounded-lg cursor-pointer hover:border-dark-purple
-                                `}
+                                    `}
+                                type="button"
+                                aria-expanded={selectOpen}
+                                aria-haspopup={true}
                             >
                                 <span className="text-black text-body-l dark:text-white">{activeColumn?.name}</span>
 
@@ -302,6 +312,7 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
                                                     <button 
                                                         onClick={ () => handleStatusChange(column.id) }
                                                         className="w-full px-4 text-medium-grey text-body-l text-left rounded-lg cursor-pointer group-hover:text-black group-hover:dark:text-white"
+                                                        type="button"
                                                     >
                                                         {column.name}
                                                     </button>

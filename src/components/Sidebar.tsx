@@ -35,18 +35,24 @@ export default function Sidebar() {
     const boardButtons = boards.map( (board) => {
         return (
             <li 
+                title={board.name}
                 className="flex items-center w-full rounded-r-full" 
                 key={board.id}
             >
                 <button 
-                    onClick={ () => setActiveBoardId(board.id) } 
+                    onClick={ () => setActiveBoardId(board.id) }
                     className={`
                         flex items-center gap-x-3 w-full text-heading-m pl-6 py-3.5 rounded-r-full cursor-pointer 
                         ${activeBoard?.id === board.id ? "text-white bg-dark-purple" : "text-medium-grey hover:text-dark-purple hover:bg-dark-purple/10 dark:hover:bg-white"}    
                     `}
+                    type="button" 
+                    aria-label={`Set active board to ${board.name}`}
                 >
-                    <BoardIcon/>
-                    {board.name}
+                    <BoardIcon aria-hidden={true}/>
+
+                    <span className="flex-1 min-w-0 truncate text-left">
+                        {board.name}
+                    </span>
                 </button>
             </li>
         )
@@ -73,7 +79,10 @@ export default function Sidebar() {
                 !isTablet ? null
                 : 
                 isTablet && sidebarOpen ? (
-                    <div className="flex flex-col justify-between shrink-0 w-65.25 2xl:w-75 border-r border-lines-light dark:bg-dark-grey dark:border-lines-dark ">
+                    <div 
+                        className="flex flex-col justify-between shrink-0 w-65.25 2xl:w-75 border-r border-lines-light dark:bg-dark-grey dark:border-lines-dark"
+                        aria-label="Boards"
+                    >
                         <div className="flex flex-col">
                             {/* Heading */}
                             <h2 className="mt-7.75 mb-4.75 pl-6 text-[0.75rem] text-medium-grey font-bold tracking-[0.15rem] uppercase">All boards ({boardsNum})</h2>
@@ -84,12 +93,14 @@ export default function Sidebar() {
                             </ul>
 
                             <button 
-                                onClick={ () => setAddBoardOpen(true) } 
+                                onClick={ () => setAddBoardOpen(true) }
                                 className={`
                                     flex items-center gap-x-3 w-full text-dark-purple text-heading-m
                                     ${boards.length === 0 ? "-mt-3.5" : ""}
                                     pl-6 py-3.5 rounded-r-full cursor-pointer
                                 `}
+                                type="button" 
+                                aria-haspopup={true}
                             >
                                 <BoardIcon/>
                                 + Create New Board
@@ -113,10 +124,14 @@ export default function Sidebar() {
                             </div>
             
                             <button 
-                                onClick={ () => setSidebarOpen(!sidebarOpen) } 
+                                onClick={ () => setSidebarOpen(!sidebarOpen) }
                                 className="flex items-center gap-x-3.75 w-60 2xl:w-69 pl-6 py-3.5 text-medium-grey text-heading-m cursor-pointer hover:text-dark-purple hover:bg-dark-purple/10 rounded-r-full dark:hover:bg-white"
+                                type="button" 
                             >
-                                <HideSidebarIcon className="mt-1"/>
+                                <HideSidebarIcon 
+                                    className="mt-1"
+                                    aria-hidden={true}
+                                />
                                 Hide Sidebar
                             </button>
                         </div>
@@ -125,10 +140,11 @@ export default function Sidebar() {
                 : (
                     // Show sidebar button
                     <button 
-                        onClick={ () => setSidebarOpen(true) } 
+                        onClick={ () => setSidebarOpen(true) }
                         className="absolute left-0 bottom-8 flex justify-center items-center w-14 h-12 text-white bg-dark-purple rounded-r-full cursor-pointer hover:bg-light-purple"
+                        type="button" 
                     >
-                        <ShowSidebarIcon />
+                        <ShowSidebarIcon aria-hidden={true}/>
                     </button>
                 )
             }

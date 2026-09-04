@@ -69,8 +69,8 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
     function handleTitleChange(value: string) {
         setTitle(value)
         
-        // If there's an error key for title, but title has since been updated, remove the error key
-        if (formErrors.title && title) {
+        // If there's an error key for title, remove it
+        if (formErrors.title) {
             setFormErrors( (prevFormErrors) => {
                 const {title, ...rest} = prevFormErrors
                 
@@ -85,8 +85,8 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
     function handleDescriptionChange(value: string) {
         setDescription(value)
         
-        // If there's an error key for description, but description has since been updated, remove the error key
-        if (formErrors.description && description) {
+        // If there's an error key for description, remove it
+        if (formErrors.description) {
             setFormErrors( (prevFormErrors) => {
                 const {description, ...rest} = prevFormErrors
                 
@@ -114,8 +114,8 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
         // Without this, TypeScript will complain
         const currentSubtask = `subtask-${subtaskId}` as const
         
-        // If there's an error key for a subtask, but that subtask has since been updated, remove the error key
-        if (formErrors[currentSubtask] && value) {
+        // If there's an error key for a subtask, remove it
+        if (formErrors[currentSubtask]) {
             setFormErrors( (prevFormErrors) => {
                 const {[currentSubtask]: _, ...rest} = prevFormErrors
                 
@@ -209,19 +209,20 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
                                 type="text"
                                 value={title}
                                 onChange={ (e) => handleTitleChange(e.target.value) }
+                                maxLength={100}
                                 id="title"
                                 placeholder="e.g. Take coffee break"
                                 className={`
                                     w-full px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25 
                                         ${
-                                            (formErrors.title && !title) ? "border-dark-red focus:border-dark-purple" 
+                                            formErrors.title ? "border-dark-red focus:border-dark-purple" 
                                             : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
                                         }
                                     `}
                             />
 
                             {
-                                (formErrors.title && !title) &&
+                                formErrors.title &&
                                 <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors.title}</span>
                             }
                         </div>
@@ -240,19 +241,20 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
                             <textarea 
                                 value={description}
                                 onChange={ (e) => handleDescriptionChange(e.target.value) }
+                                maxLength={500}
                                 id="description"
                                 placeholder="e.g. It's always good to take a break. This 15 minute break will recharge the batteries a little."
                                 className={`
                                     resize-none w-full h-28 px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25
                                         ${
-                                            (formErrors.description && !description) ? "border-dark-red focus:border-dark-purple" 
+                                            formErrors.description ? "border-dark-red focus:border-dark-purple" 
                                             : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
                                         }
                                     `}
                             />
 
                             {
-                                (formErrors.description && !description) &&
+                                formErrors.description &&
                                 <span className="absolute bottom-2.5 right-2 text-dark-red text-body-l">{formErrors.description}</span>
                             }
                         </div>
@@ -263,7 +265,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
                         <h3 className="text-medium-grey text-[0.75rem] font-bold dark:text-white">Subtasks</h3>
 
                         <ul className={`
-                                flex flex-col gap-y-3 mt-2 
+                                flex flex-col gap-y-3 mt-2 h-25 pr-1.5 overflow-y-auto
                                 ${subtasks.length > 0 ? "mb-3" : "mb-0"}
                             `}
                         >
@@ -279,18 +281,19 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
                                                     type="text"
                                                     value={subtask.title}
                                                     onChange={ (e) => handleSubtaskChange(subtask.id, e.target.value) }
+                                                    maxLength={100}
                                                     placeholder={subtask.placeholder}
                                                     className={`
                                                         w-full px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25
                                                             ${
-                                                                (formErrors[`subtask-${subtask.id}`] && !subtask.title) ? "border-dark-red focus:border-dark-purple" 
+                                                                formErrors[`subtask-${subtask.id}`] ? "border-dark-red focus:border-dark-purple" 
                                                                 : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
                                                             }
                                                         `} 
                                                 />
 
                                                 {
-                                                    (formErrors[`subtask-${subtask.id}`] && !subtask.title) && 
+                                                    formErrors[`subtask-${subtask.id}`] && 
                                                     <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors[`subtask-${subtask.id}`]}</span>
                                                 }
                                             </div>

@@ -30,8 +30,8 @@ export default function BoardForm({initialValues, formHeading, formButtonText, o
     function handleNameChange(value: string) {
         setName(value)
         
-        // If there's an error key for name, but name has since been updated, remove the error key
-        if (formErrors.name && name) {
+        // If there's an error key for name, remove it
+        if (formErrors.name) {
             setFormErrors( (prevFormErrors) => {
                 const {name, ...rest} = prevFormErrors
                 
@@ -59,8 +59,8 @@ export default function BoardForm({initialValues, formHeading, formButtonText, o
         // Without this, TypeScript will complain
         const currentColumn = `column-${columnId}` as const
         
-        // If there's an error key for a column, but that column has since been updated, remove the error key
-        if (formErrors[currentColumn] && value) {
+        // If there's an error key for a column, remove it
+        if (formErrors[currentColumn]) {
             setFormErrors( (prevFormErrors) => {
                 const {[currentColumn]: _, ...rest} = prevFormErrors
                 
@@ -145,19 +145,20 @@ export default function BoardForm({initialValues, formHeading, formButtonText, o
                                 type="text"
                                 value={name}
                                 onChange={ (e) => handleNameChange(e.target.value) }
+                                maxLength={50}
                                 id="name"
                                 placeholder="e.g. Web Design"
                                 className={`
                                     w-full px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25 
                                         ${
-                                            (formErrors.name && !name) ? "border-dark-red focus:border-dark-purple" 
+                                            formErrors.name ? "border-dark-red focus:border-dark-purple" 
                                             : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
                                         }
                                     `}
                             />
 
                             {
-                                (formErrors.name && !name) &&
+                                formErrors.name &&
                                 <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors.name}</span>
                             }
                         </div>
@@ -167,7 +168,10 @@ export default function BoardForm({initialValues, formHeading, formButtonText, o
                     <div className="flex flex-col">
                         <h3 className="text-medium-grey text-[0.75rem] font-bold dark:text-white">Columns</h3>
 
-                        <ul className={`flex flex-col gap-y-3 mt-2 ${columns.length > 0 ? "mb-3" : "mb-0"}`}>
+                        <ul className={`
+                                flex flex-col gap-y-3 mt-2 h-25 pr-1.5 overflow-y-auto
+                                ${columns.length > 0 ? "mb-3" : "mb-0"}
+                            `}>
                             {
                                 columns.map( (column) => {
                                     return (
@@ -179,19 +183,20 @@ export default function BoardForm({initialValues, formHeading, formButtonText, o
                                                 <input
                                                     type="text"
                                                     value={column.name}
+                                                    maxLength={15}
                                                     onChange={ (e) => handleColumnChange(column.id, e.target.value) }
                                                     className={`
                                                         w-full px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25
                                                             ${
-                                                                (formErrors[`column-${column.id}`] && !column.name) ? "border-dark-red focus:border-dark-purple" 
+                                                                formErrors[`column-${column.id}`] ? "border-dark-red focus:border-dark-purple" 
                                                                 : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
                                                             }
                                                         `} 
                                                 />
 
                                                 {
-                                                    (formErrors[`column-${column.id}`] && !column.name) && 
-                                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">formErrors[`column-${column.id}`]</span>
+                                                    formErrors[`column-${column.id}`] && 
+                                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors[`column-${column.id}`]}</span>
                                                 }
                                             </div>
 

@@ -26,8 +26,8 @@ export default function AddColumn({onClose}: AddColumnProps) {
     function handleNameChange(value: string) {
         setName(value)
         
-        // If there's an error key for name, but name has since been updated, remove the error key
-        if (formErrors.name && name) {
+        // If there's an error key for name, remove it
+        if (formErrors.name) {
             setFormErrors( (prevFormErrors) => {
                 const {name, ...rest} = prevFormErrors
                 
@@ -106,19 +106,20 @@ export default function AddColumn({onClose}: AddColumnProps) {
                                 type="text"
                                 value={name}
                                 onChange={ (e) => handleNameChange(e.target.value) }
+                                maxLength={15}
                                 id="name"
                                 placeholder="e.g. Web Design"
                                 className={`
                                     w-full px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25 
                                         ${
-                                            (formErrors.name && !name) ? "border-dark-red focus:border-dark-purple" 
+                                            formErrors.name ? "border-dark-red focus:border-dark-purple" 
                                             : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
                                         }
-                                    `}
+                                `}
                             />
 
                             {
-                                (formErrors.name && !name) &&
+                                formErrors.name &&
                                 <span className="absolute top-2.5 right-2 text-dark-red text-body-l">Can't be empty</span>
                             }
                         </div>

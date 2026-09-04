@@ -11,6 +11,8 @@ export default function ThemeSwitch() {
             className={`
                 flex items-center w-10 h-5 p-1 bg-dark-purple rounded-full cursor-pointer transition hover:bg-light-purple
             `}
+            aria-label="Toggle dark mode"
+            aria-pressed={darkMode}
         >
 
             <div 
