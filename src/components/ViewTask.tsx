@@ -1,6 +1,9 @@
 // Hooks
 import { useState, useRef, useEffect } from "react"
 
+// Components
+import { FocusTrap } from "focus-trap-react"
+
 // Context
 import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
@@ -39,8 +42,9 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
 
     const completedTasks = activeTask?.subtasks.filter( (subtask) => subtask.isCompleted === true)
     
-    // Handle outside clicks
+    // Handle outside clicks and escape
     useEffect( () => {
+        // Handle outside clicks
         function handleOutsideClick(event: MouseEvent) {
             // Task settings
             if (
@@ -58,13 +62,23 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
                 setSelectOpen(false)
             }
         }
+
+        // Close the modal if the escape key is pressed
+        function handleEscape(event: KeyboardEvent) {
+            if (event.key === "Escape") {
+                setActiveTaskId(null)
+            }
+        }
         
         document.addEventListener("mousedown", handleOutsideClick)
+        document.addEventListener("keydown", handleEscape)
 
         return () => {
             document.removeEventListener("mousedown", handleOutsideClick)
+            document.removeEventListener("keydown", handleEscape)
         }
     }, [])
+
 
     // Handle checkbox changes for activeTask's subtasks
     function handleCheckboxChange(targetSubtaskId: string) {
@@ -176,11 +190,13 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
     }
 
     return (
-            <div 
-                onClick={ (e) => { if (e.target === e.currentTarget) setActiveTaskId(null) } }
-                className="absolute inset-0 flex justify-center items-center p-4 bg-black/50"
-            >
-                <div className="z-10 flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-dark-grey">
+        <div 
+            onMouseDown={ (e) => { if (e.target === e.currentTarget) setActiveTaskId(null) } }
+            className="absolute inset-0 flex justify-center items-center p-4 bg-black/50"
+        >
+            <FocusTrap>
+                <div 
+                className="z-10 flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-dark-grey">
                     {/* Heading and settings button */}
                     <div className="flex justify-between items-center gap-x-6">
                         <h2 className="text-black text-heading-l dark:text-white">{activeTask.title}</h2>
@@ -325,6 +341,7 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
                         </div>
                     </div>
                 </div>
-            </div>
+            </FocusTrap>
+        </div>
     )
 }

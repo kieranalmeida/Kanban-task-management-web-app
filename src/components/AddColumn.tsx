@@ -1,5 +1,8 @@
 // Hooks
-import { useState } from "react"
+import { useState, useEffect } from "react"
+
+// Components
+import { FocusTrap } from "focus-trap-react"
 
 // Context
 import { useBoards } from "./BoardsContext"
@@ -21,6 +24,22 @@ export default function AddColumn({onClose}: AddColumnProps) {
     // Context
     const { setBoards } = useBoards()
     const { activeBoardId } = useActiveBoardId()
+
+    // Handle escape
+    useEffect( () => {
+        // Close the modal if the escape key is pressed
+        function handleEscape(event: KeyboardEvent) {
+            if (event.key === "Escape") {
+                onClose()
+            }
+        }
+        
+        document.addEventListener("keydown", handleEscape)
+
+        return () => {
+            document.removeEventListener("keydown", handleEscape)
+        }
+    }, [])
 
     // Handle name input change
     function handleNameChange(value: string) {
@@ -81,59 +100,61 @@ export default function AddColumn({onClose}: AddColumnProps) {
 
     return (
         <div
-            onClick={ (e) => { if (e.target === e.currentTarget) onClose() } } 
+            onMouseDown={ (e) => { if (e.target === e.currentTarget) onClose() } }
             className="absolute z-10 inset-0 flex justify-center items-center p-4 bg-black/50"
         >
-            <div className="flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-very-dark-grey">
-                <h2 className="text-black text-heading-l dark:text-white">Add New Column</h2>
+            <FocusTrap>
+                <div className="flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-very-dark-grey">
+                    <h2 className="text-black text-heading-l dark:text-white">Add New Column</h2>
 
-                <form 
-                    onSubmit={handleSubmit}
-                    noValidate
-                    className="flex flex-col gap-y-6" 
-                >
-                    {/* Name */}
-                    <div className="flex flex-col gap-y-2">
-                        <label 
-                            htmlFor="name"
-                            className="text-medium-grey text-[0.75rem] font-bold dark:text-white"
-                        >
-                            Column Name
-                        </label>
-
-                        <div className="relative">
-                            <input 
-                                type="text"
-                                value={name}
-                                onChange={ (e) => handleNameChange(e.target.value) }
-                                maxLength={15}
-                                id="name"
-                                placeholder="e.g. Web Design"
-                                className={`
-                                    w-full px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25 
-                                        ${
-                                            formErrors.name ? "border-dark-red focus:border-dark-purple" 
-                                            : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
-                                        }
-                                `}
-                            />
-
-                            {
-                                formErrors.name &&
-                                <span className="absolute top-2.5 right-2 text-dark-red text-body-l">Can't be empty</span>
-                            }
-                        </div>
-                    </div>
-
-                    {/* Submit */}
-                    <button
-                        type="submit"
-                        className="w-full py-2 text-white text-[0.8125rem] font-bold leading-5.75 bg-dark-purple rounded-full cursor-pointer hover:bg-light-purple"
+                    <form 
+                        onSubmit={handleSubmit}
+                        noValidate
+                        className="flex flex-col gap-y-6" 
                     >
-                        Create Column
-                    </button>
-                </form>
-            </div>
+                        {/* Name */}
+                        <div className="flex flex-col gap-y-2">
+                            <label 
+                                htmlFor="name"
+                                className="text-medium-grey text-[0.75rem] font-bold dark:text-white"
+                            >
+                                Column Name
+                            </label>
+
+                            <div className="relative">
+                                <input 
+                                    type="text"
+                                    value={name}
+                                    onChange={ (e) => handleNameChange(e.target.value) }
+                                    maxLength={15}
+                                    id="name"
+                                    placeholder="e.g. Web Design"
+                                    className={`
+                                        w-full px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25 
+                                            ${
+                                                formErrors.name ? "border-dark-red focus:border-dark-purple" 
+                                                : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
+                                            }
+                                    `}
+                                />
+
+                                {
+                                    formErrors.name &&
+                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">Can't be empty</span>
+                                }
+                            </div>
+                        </div>
+
+                        {/* Submit */}
+                        <button
+                            type="submit"
+                            className="w-full py-2 text-white text-[0.8125rem] font-bold leading-5.75 bg-dark-purple rounded-full cursor-pointer hover:bg-light-purple"
+                        >
+                            Create Column
+                        </button>
+                    </form>
+                </div>
+            </FocusTrap>
         </div>
     )
 }

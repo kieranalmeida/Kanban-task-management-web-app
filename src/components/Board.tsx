@@ -173,11 +173,3 @@ export default function Board() {
         </>
     )
 }
-
-// Performance issues?
-// Testing + test smaller screen sizes for bugs
-
-// User can still tab through elements but not click when black background is active + handle escape (react-focus-trap)
-
-// Revert data.json changes
-// List things learned

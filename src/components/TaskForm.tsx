@@ -1,6 +1,9 @@
 // Hooks
 import { useState, useRef, useEffect} from "react"
 
+// Components
+import { FocusTrap } from "focus-trap-react"
+
 // Context
 import { useBoards } from "./BoardsContext"
 import { useActiveBoardId } from "./ActiveBoardContextId"
@@ -46,7 +49,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
     const activeBoard = boards.find( (board) => board.id === activeBoardId)
     const targetColumn = activeBoard?.columns.find( (column) => column.id === targetColumnId)
 
-    // Handle outside clicks
+    // Handle outside clicks and escape
     useEffect( () => {
         function handleOutsideClick(event: MouseEvent) {
             // Select box
@@ -58,10 +61,19 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
             }
         }
         
+        // Close the modal if the escape key is pressed
+        function handleEscape(event: KeyboardEvent) {
+            if (event.key === "Escape") {
+                onClose()
+            }
+        }
+        
         document.addEventListener("mousedown", handleOutsideClick)
+        document.addEventListener("keydown", handleEscape)
 
         return () => {
             document.removeEventListener("mousedown", handleOutsideClick)
+            document.removeEventListener("keydown", handleEscape)
         }
     }, [])
     
@@ -184,202 +196,204 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
     
     return (
         <div 
-            onClick={ (e) => { if (e.target === e.currentTarget) onClose() } }
+            onMouseDown={ (e) => { if (e.target === e.currentTarget) onClose() } }
             className="absolute z-10 inset-0 flex justify-center items-center p-4 bg-black/50"
         >
-            <div className="flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-very-dark-grey">
-                <h2 className="text-black text-heading-l dark:text-white">{formHeading}</h2>
+            <FocusTrap>
+                <div className="flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-very-dark-grey">
+                    <h2 className="text-black text-heading-l dark:text-white">{formHeading}</h2>
 
-                <form 
-                    onSubmit={handleSubmit}
-                    noValidate
-                    className="flex flex-col gap-y-6" 
-                >
-                    {/* Title */}
-                    <div className="flex flex-col gap-y-2">
-                        <label 
-                            htmlFor="title"
-                            className="text-medium-grey text-[0.75rem] font-bold dark:text-white"
-                        >
-                            Title
-                        </label>
+                    <form 
+                        onSubmit={handleSubmit}
+                        noValidate
+                        className="flex flex-col gap-y-6" 
+                    >
+                        {/* Title */}
+                        <div className="flex flex-col gap-y-2">
+                            <label 
+                                htmlFor="title"
+                                className="text-medium-grey text-[0.75rem] font-bold dark:text-white"
+                            >
+                                Title
+                            </label>
 
-                        <div className="relative">
-                            <input 
-                                type="text"
-                                value={title}
-                                onChange={ (e) => handleTitleChange(e.target.value) }
-                                maxLength={100}
-                                id="title"
-                                placeholder="e.g. Take coffee break"
-                                className={`
-                                    w-full px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25 
-                                        ${
-                                            formErrors.title ? "border-dark-red focus:border-dark-purple" 
-                                            : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
-                                        }
-                                    `}
-                            />
+                            <div className="relative">
+                                <input 
+                                    type="text"
+                                    value={title}
+                                    onChange={ (e) => handleTitleChange(e.target.value) }
+                                    maxLength={100}
+                                    id="title"
+                                    placeholder="e.g. Take coffee break"
+                                    className={`
+                                        w-full px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25 
+                                            ${
+                                                formErrors.title ? "border-dark-red focus:border-dark-purple" 
+                                                : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
+                                            }
+                                        `}
+                                />
 
-                            {
-                                formErrors.title &&
-                                <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors.title}</span>
-                            }
+                                {
+                                    formErrors.title &&
+                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors.title}</span>
+                                }
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Description */}
-                    <div>
-                        <label
-                            htmlFor="description"
-                            className="text-medium-grey text-[0.75rem] font-bold dark:text-white"
-                        >
-                            Description
-                        </label>
- 
-                        <div className="relative">
-                            <textarea 
-                                value={description}
-                                onChange={ (e) => handleDescriptionChange(e.target.value) }
-                                maxLength={500}
-                                id="description"
-                                placeholder="e.g. It's always good to take a break. This 15 minute break will recharge the batteries a little."
-                                className={`
-                                    resize-none w-full h-28 px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25
-                                        ${
-                                            formErrors.description ? "border-dark-red focus:border-dark-purple" 
-                                            : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
-                                        }
-                                    `}
-                            />
+                        {/* Description */}
+                        <div>
+                            <label
+                                htmlFor="description"
+                                className="text-medium-grey text-[0.75rem] font-bold dark:text-white"
+                            >
+                                Description
+                            </label>
+    
+                            <div className="relative">
+                                <textarea 
+                                    value={description}
+                                    onChange={ (e) => handleDescriptionChange(e.target.value) }
+                                    maxLength={500}
+                                    id="description"
+                                    placeholder="e.g. It's always good to take a break. This 15 minute break will recharge the batteries a little."
+                                    className={`
+                                        resize-none w-full h-28 px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25
+                                            ${
+                                                formErrors.description ? "border-dark-red focus:border-dark-purple" 
+                                                : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
+                                            }
+                                        `}
+                                />
 
-                            {
-                                formErrors.description &&
-                                <span className="absolute bottom-2.5 right-2 text-dark-red text-body-l">{formErrors.description}</span>
-                            }
+                                {
+                                    formErrors.description &&
+                                    <span className="absolute bottom-2.5 right-2 text-dark-red text-body-l">{formErrors.description}</span>
+                                }
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Subtasks */}
-                    <div className="flex flex-col">
-                        <h3 className="text-medium-grey text-[0.75rem] font-bold dark:text-white">Subtasks</h3>
+                        {/* Subtasks */}
+                        <div className="flex flex-col">
+                            <h3 className="text-medium-grey text-[0.75rem] font-bold dark:text-white">Subtasks</h3>
 
-                        <ul className={`
-                                flex flex-col gap-y-3 mt-2 h-25 pr-1.5 overflow-y-auto
-                                ${subtasks.length > 0 ? "mb-3" : "mb-0"}
-                            `}
-                        >
-                            {
-                                subtasks.map( (subtask) => {
-                                    return (
-                                        <li 
-                                            className="flex gap-x-4" 
-                                            key={subtask.id}
-                                        >
-                                            <div className="relative w-full">
-                                                <input
-                                                    type="text"
-                                                    value={subtask.title}
-                                                    onChange={ (e) => handleSubtaskChange(subtask.id, e.target.value) }
-                                                    maxLength={100}
-                                                    placeholder={subtask.placeholder}
-                                                    className={`
-                                                        w-full px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25
-                                                            ${
-                                                                formErrors[`subtask-${subtask.id}`] ? "border-dark-red focus:border-dark-purple" 
-                                                                : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
-                                                            }
-                                                        `} 
-                                                />
-
-                                                {
-                                                    formErrors[`subtask-${subtask.id}`] && 
-                                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors[`subtask-${subtask.id}`]}</span>
-                                                }
-                                            </div>
-
-                                            <button
-                                                type="button"
-                                                onClick={ () => handleSubtaskDelete(subtask.id) }
-                                                className="text-medium-grey cursor-pointer hover:text-dark-red"
-                                            >
-                                                <IconCross/>
-                                            </button>
-                                        </li>
-                                    )
-                                })
-                            }
-                        </ul>
-                        
-                        <button
-                            type="button"
-                            onClick={ () => handleAddSubtask() }
-                            className="w-full py-2 text-dark-purple text-[0.8125rem] font-bold leading-5.75 bg-dark-purple/10 rounded-full cursor-pointer hover:bg-dark-purple/25 dark:bg-white dark:hover:bg-white"
-                        >
-                            + Add new subtask
-                        </button>
-                    </div>
-
-                    {/* Select box */}
-                    <div className="flex flex-col gap-y-2">
-                        <h2 className="text-medium-grey text-body-m dark:text-white">Current Status</h2>
-
-                        <div 
-                            ref={selectBoxRef} 
-                            className="relative"
-                        >
-                            <button
-                                type="button"
-                                onClick={ () => setSelectOpen(!selectOpen) }
-                                className={`
-                                    relative flex justify-between items-center w-full px-4 py-2 border 
-                                    ${selectOpen ? "border-dark-purple" : "border-medium-grey/25"}
-                                    rounded-lg cursor-pointer hover:border-dark-purple
+                            <ul className={`
+                                    flex flex-col gap-y-3 max-h-25 mt-2 pr-1.5 overflow-y-auto
+                                    ${subtasks.length > 0 ? "mb-3" : "mb-0"}
                                 `}
                             >
-                                <span className="text-black text-body-l dark:text-white">{targetColumn?.name}</span>
+                                {
+                                    subtasks.map( (subtask) => {
+                                        return (
+                                            <li 
+                                                className="flex gap-x-4" 
+                                                key={subtask.id}
+                                            >
+                                                <div className="relative w-full">
+                                                    <input
+                                                        type="text"
+                                                        value={subtask.title}
+                                                        onChange={ (e) => handleSubtaskChange(subtask.id, e.target.value) }
+                                                        maxLength={100}
+                                                        placeholder={subtask.placeholder}
+                                                        className={`
+                                                            w-full px-4 py-2 text-body-l placeholder-black/25 border outline-0 rounded-sm focus:border-dark-purple dark:text-white dark:placeholder-white/25
+                                                                ${
+                                                                    formErrors[`subtask-${subtask.id}`] ? "border-dark-red focus:border-dark-purple" 
+                                                                    : "border-medium-grey/25  hover:border-dark-purple dark:outline-0"
+                                                                }
+                                                            `} 
+                                                    />
 
-                                <img 
-                                    className="mt-1" 
-                                    src={chevronDown} 
-                                    alt=""
-                                />
-                            </button>
+                                                    {
+                                                        formErrors[`subtask-${subtask.id}`] && 
+                                                        <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors[`subtask-${subtask.id}`]}</span>
+                                                    }
+                                                </div>
 
-                            {selectOpen &&
-                                <ul className="absolute mt-2.5 flex flex-col gap-y-2 w-full py-4 bg-white rounded-lg shadow-lg dark:bg-very-dark-grey">
-                                    {
-                                        activeBoard?.columns?.map( (column) => {
-                                            return (
-                                                <li 
-                                                    className="group hover:bg-light-grey hover:dark:bg-dark-grey" 
-                                                    key={column.id}
+                                                <button
+                                                    type="button"
+                                                    onClick={ () => handleSubtaskDelete(subtask.id) }
+                                                    className="text-medium-grey cursor-pointer hover:text-dark-red"
                                                 >
-                                                    <button 
-                                                        type="button"
-                                                        onClick={ () => handleSelectBox(column.id) }
-                                                        className="w-full px-4 text-medium-grey text-body-l text-left rounded-lg cursor-pointer group-hover:text-black group-hover:dark:text-white"
-                                                    >
-                                                        {column.name}
-                                                    </button>
-                                                </li>
-                                            )
-                                        })
-                                    }
-                                </ul>
-                            }
+                                                    <IconCross/>
+                                                </button>
+                                            </li>
+                                        )
+                                    })
+                                }
+                            </ul>
+                            
+                            <button
+                                type="button"
+                                onClick={ () => handleAddSubtask() }
+                                className="w-full py-2 text-dark-purple text-[0.8125rem] font-bold leading-5.75 bg-dark-purple/10 rounded-full cursor-pointer hover:bg-dark-purple/25 dark:bg-white dark:hover:bg-white"
+                            >
+                                + Add new subtask
+                            </button>
                         </div>
-                    </div>
 
-                    {/* Submit */}
-                    <button
-                        type="submit"
-                        className="w-full py-2 text-white text-[0.8125rem] font-bold leading-5.75 bg-dark-purple rounded-full cursor-pointer hover:bg-light-purple"
-                    >
-                        {formButtonText}
-                    </button>
-                </form>
-            </div>
+                        {/* Select box */}
+                        <div className="flex flex-col gap-y-2">
+                            <h2 className="text-medium-grey text-body-m dark:text-white">Current Status</h2>
+
+                            <div 
+                                ref={selectBoxRef} 
+                                className="relative"
+                            >
+                                <button
+                                    type="button"
+                                    onClick={ () => setSelectOpen(!selectOpen) }
+                                    className={`
+                                        relative flex justify-between items-center w-full px-4 py-2 border 
+                                        ${selectOpen ? "border-dark-purple" : "border-medium-grey/25"}
+                                        rounded-lg cursor-pointer hover:border-dark-purple
+                                    `}
+                                >
+                                    <span className="text-black text-body-l dark:text-white">{targetColumn?.name}</span>
+
+                                    <img 
+                                        className="mt-1" 
+                                        src={chevronDown} 
+                                        alt=""
+                                    />
+                                </button>
+
+                                {selectOpen &&
+                                    <ul className="absolute mt-2.5 flex flex-col gap-y-2 w-full py-4 bg-white rounded-lg shadow-lg dark:bg-very-dark-grey">
+                                        {
+                                            activeBoard?.columns?.map( (column) => {
+                                                return (
+                                                    <li 
+                                                        className="group hover:bg-light-grey hover:dark:bg-dark-grey" 
+                                                        key={column.id}
+                                                    >
+                                                        <button 
+                                                            type="button"
+                                                            onClick={ () => handleSelectBox(column.id) }
+                                                            className="w-full px-4 text-medium-grey text-body-l text-left rounded-lg cursor-pointer group-hover:text-black group-hover:dark:text-white"
+                                                        >
+                                                            {column.name}
+                                                        </button>
+                                                    </li>
+                                                )
+                                            })
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+
+                        {/* Submit */}
+                        <button
+                            type="submit"
+                            className="w-full py-2 text-white text-[0.8125rem] font-bold leading-5.75 bg-dark-purple rounded-full cursor-pointer hover:bg-light-purple"
+                        >
+                            {formButtonText}
+                        </button>
+                    </form>
+                </div>
+            </FocusTrap>
         </div>
     )
 }
