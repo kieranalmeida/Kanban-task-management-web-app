@@ -173,5 +173,3 @@ export default function Board() {
         </>
     )
 }
-
-// List things learned

@@ -1,13 +1,3 @@
-README-template.md
-README.md
-
-# Avoid accidental upload of the Sketch and Figma design files
-#####################################################
-## Please do not remove lines 5 and 6 - thanks! 🙂 ##
-#####################################################
-*.sketch
-*.fig
-
 # Avoid accidental XD upload if you convert the design file
 ###############################################
 ## Please do not remove line 12 - thanks! 🙂 ##
@@ -17,3 +7,56 @@ README.md
 # Avoid your project being littered with annoying .DS_Store files!
 .DS_Store
 .prettierignore
+
+# Challenge reference files (used during development, not part of your solution)
+spec/
+guidance/
+AGENTS.md
+CLAUDE.md
+README-template.md
+preview.jpg
+README.md
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build
+dist/
+build/
+.next/
+out/
+.nuxt/
+.output/
+.svelte-kit/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test
+coverage/
+
+# Misc
+*.tsbuildinfo
