@@ -13,9 +13,7 @@ spec/
 guidance/
 AGENTS.md
 CLAUDE.md
-README-template.md
 preview.jpg
-README.md
 
 # Dependencies
 node_modules/
