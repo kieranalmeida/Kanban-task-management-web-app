@@ -140,7 +140,7 @@ export default function AddColumn({onClose}: AddColumnProps) {
 
                                 {
                                     formErrors.name &&
-                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">Can't be empty</span>
+                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l pointer-events-none">Can't be empty</span>
                                 }
                             </div>
                         </div>

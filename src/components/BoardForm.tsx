@@ -179,7 +179,7 @@ export default function BoardForm({initialValues, formHeading, formButtonText, o
 
                                 {
                                     formErrors.name &&
-                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors.name}</span>
+                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l pointer-events-none">{formErrors.name}</span>
                                 }
                             </div>
                         </div>
@@ -216,7 +216,7 @@ export default function BoardForm({initialValues, formHeading, formButtonText, o
 
                                                     {
                                                         formErrors[`column-${column.id}`] && 
-                                                        <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors[`column-${column.id}`]}</span>
+                                                        <span className="absolute top-2.5 right-2 text-dark-red text-body-l pointer-events-none">{formErrors[`column-${column.id}`]}</span>
                                                     }
                                                 </div>
 

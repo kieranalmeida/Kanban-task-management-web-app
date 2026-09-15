@@ -172,7 +172,7 @@ export default function Header() {
                     {/* Tablet and Desktop logo */}
                     <div className={`
                         items-center shrink-0 h-full flex-1 w-full 
-                        ${sidebarOpen ? "md:w-65 2xl:w-75" : "w-52"}
+                        ${sidebarOpen ? "md:w-65 2xl:w-75" : "w-52 pr-6"}
                         pl-6 border-r border-lines-light hidden md:flex dark:border-lines-dark`}
                     >
                         <Link to="/">

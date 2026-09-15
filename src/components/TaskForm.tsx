@@ -236,7 +236,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
 
                                 {
                                     formErrors.title &&
-                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors.title}</span>
+                                    <span className="absolute top-2.5 right-2 text-dark-red text-body-l pointer-events-none">{formErrors.title}</span>
                                 }
                             </div>
                         </div>
@@ -268,7 +268,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
 
                                 {
                                     formErrors.description &&
-                                    <span className="absolute bottom-2.5 right-2 text-dark-red text-body-l">{formErrors.description}</span>
+                                    <span className="absolute bottom-2.5 right-2 text-dark-red text-body-l pointer-events-none">{formErrors.description}</span>
                                 }
                             </div>
                         </div>
@@ -307,7 +307,7 @@ export default function TaskForm({initialValues, formHeading, formButtonText, on
 
                                                     {
                                                         formErrors[`subtask-${subtask.id}`] && 
-                                                        <span className="absolute top-2.5 right-2 text-dark-red text-body-l">{formErrors[`subtask-${subtask.id}`]}</span>
+                                                        <span className="absolute top-2.5 right-2 text-dark-red text-body-l pointer-events-none">{formErrors[`subtask-${subtask.id}`]}</span>
                                                     }
                                                 </div>
 

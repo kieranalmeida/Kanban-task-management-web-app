@@ -199,7 +199,7 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
                 className="z-10 flex flex-col gap-y-6 w-full sm:w-85.75 md:w-120 p-6 md:p-8 bg-white rounded-lg dark:bg-dark-grey">
                     {/* Heading and settings button */}
                     <div className="flex justify-between items-center gap-x-6">
-                        <h2 className="text-black text-heading-l dark:text-white">{activeTask.title}</h2>
+                        <h2 className="min-w-0 text-black text-heading-l wrap-break-word dark:text-white">{activeTask.title}</h2>
 
                         {/* Settings button and menu */}
                         <div 
@@ -244,7 +244,7 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
                     </div>
 
                     {/* Description */}
-                    <p className="text-medium-grey text-body-l">{activeTask.description}</p>
+                    <p className="min-w-0 text-medium-grey text-body-l wrap-break-word">{activeTask.description}</p>
 
                     {/* Subtasks */}
                     <div className="flex flex-col gap-y-4">
@@ -275,7 +275,7 @@ export default function ViewTask({activeTaskId, setActiveTaskId, setEditTaskId, 
                                                 <span 
                                                     className={`
                                                         ${subtask.isCompleted ? "text-medium-grey line-through" : "text-black dark:text-white"}
-                                                        text-body-m
+                                                        min-w-0 text-body-m wrap-break-word
                                                     `}
                                                 >
                                                     {subtask.title}

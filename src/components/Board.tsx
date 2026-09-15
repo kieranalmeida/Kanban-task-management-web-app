@@ -63,7 +63,7 @@ export default function Board() {
                                         type="button" 
                                         aria-haspopup={true}
                                     >
-                                        <h3 className="text-black text-heading-m group-hover:text-dark-purple dark:text-white">{task.title}</h3>
+                                        <h3 className="text-black text-heading-m wrap-break-word group-hover:text-dark-purple dark:text-white">{task.title}</h3>
                                         <p className="text-medium-grey text-body-m">{completedTasks.length} of {task.subtasks.length} subtasks</p>
                                     </button>
                                 </li>
